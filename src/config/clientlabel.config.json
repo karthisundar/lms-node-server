@@ -1,0 +1,661 @@
+{
+    "products":{
+      
+        "getAllProducts":{
+                "code":"Product_S_00001",
+                "message":""
+        },
+        "productCreatedMessage":{
+            "code":"Product_S_00002",
+            "message":"Product created successfully."
+        },
+        "vendorCreateMessage":{
+            "code":"Product_S_00003",
+            "message":"Vendor created successfully."
+        },
+        "createCategoryMessage":{
+             "code":"Product_S_00004",
+            "message":"Category created successfully."
+        },
+        "stcokDetailsUpdated":{
+            "code":"Product_S_00005",
+            "message":"Stock details updated successfully."
+        },
+        "stockDeleted":{
+            "code":"Product_S_00006",
+            "message":"Stock deleted successfully."
+        },
+        "productflavorCreated":{
+            "code":"Product_S_00007",
+            "message":"Product flavour created successfully."
+        },
+        "ProductSizeCreated":{
+            "code":"Product_S_00008",
+              "message":"Product size created successfully."
+        },
+        "barcodeSalesRateDetailsUpdated":{
+            "code":"Product_S_00009",
+            "message":"Successfully updated the barcode rate."
+        },
+        "productUpdate":{
+            "code":"Product_S_00010",
+            "message":"Product updated successfully."
+        },
+        "productError":{
+            "productNameFiledError":{
+                "code":"Product_E_00001",
+                "message":"Product name field is mandatory."
+            },
+            "productDescriptionFieldError":{
+                "code":"Product_E_00002",
+                "message":"Product description field is mandatory."
+            },
+            "categeroyNameError":{
+                 "code":"Product_E_00003",
+                "message":"Category name field is mandatory."
+            },
+            "categeroyDescriptionError":{
+                "code":"Product_E_00004",
+                "message":"Category description field is mandatory." 
+            },
+            "venderNameError":{
+                "code":"Product_E_00005",
+                "message":"Vendor name field is mandatory." 
+            },
+           
+            "categoryAlReadyExitsError":{
+                "code":"Product_E_00006",
+                "message":"Category already exists."
+            },
+            "quantityError":{
+                "code":"Product_E_00007",
+                "message":"Please enter a quantity greater than 0."
+            },
+            "unitPriceError":{
+                "code":"Product_E_00008",
+                "message":"Please enter a unit price greater than 0."
+            },
+            "taxError":{
+                 "code":"Product_E_00009",
+                "message":"Please enter a tax greater than 0."
+            },
+            "salesRateError":{
+                 "code":"Product_E_00010",
+                "message":"Please enter a sales rate greater than 0."
+            },
+            "multerFileFormatError":{
+                  "message":"unsupported file format.",
+                   "code" : "Product_E_00011"
+                },
+            "productNameError":{
+                "message":"Product name already exists.",
+                 "code" : "Product_E_00012"
+            },
+            "venderAlReadyExistNameError":{
+                "code":"Product_E_00013",
+                "message":"Vendor name already exits." 
+            },
+            "productCategroyError":{
+                "code":"Product_E_00014",
+                "message":"Kindly select a category to continue." 
+            },
+            "costRateError":{
+                "code":"Product_E_00015",
+                "message":"Please enter a purchase tax greater than 0."
+            },
+            "cost":{
+                "code":"Product_E_00016",
+                "message":"Please enter a purchase cost  greater than 0."
+            },
+            "mrp":{
+                "code":"Product_E_00017",
+                "message":"Please enter a mrp greater than 0."
+            },
+            "stockCancelError":{
+                "code":"Product_E_00018",
+                "message":"Unable to delete stock as sales have already begun."
+            },
+            "stockALLreadyDeletedError":{
+                "code":"Product_E_00019",
+                "message":"Stock has already been deleted and cannot be deleted again."
+            },
+            "productImageError":{
+                "code":"Product_E_00020",
+                "message":"Please upload a header image."
+            },
+            "onlineStoreNumberError":{
+                "code":"Product_E_00021",
+                "message":"Online store number field is mandatory."
+            },
+            "productflavourAllReadyExits":{
+                "code":"Product_E_00022",
+                "message":"Product flavour already exits."
+            },
+            "productSizeAllReadyExits":{
+                "code":"Product_E_00023",
+                "message":"Product size already exits."
+            },
+            "stockFlavorAddedError":{
+                "code":"Product_E_00024",
+                "message":"The flavor you selected is not available for this product. Please choose a different one."
+            },
+            "stockProductSizeError":{
+                "code":"Product_E_00025",
+                "message":"The product size you selected is not available for this product. Please choose a different one."
+            },
+            "categeroyNameMaxLengthError":{
+                "code":"Product_E_00026",
+                "message":"Exceeds the category name field length. Only 255 characters are allowed."
+            },
+            "cateDescrptionMaxLengthError":{
+                 "code":"Product_E_00027",
+                "message":"Exceeds the category description field length. Only 3000 characters are allowed."
+            },
+            "cateTaxExeedEror":{
+                "code":"Product_E_00028",
+                "message":"Please enter a tax less than 100."
+            },
+            "productNameMaxLengthError":{
+                 "code":"Product_E_00029",
+                "message":"Exceeds the product name field length. Only 255 characters are allowed."
+            },
+            "productDescriptionMaxLengthError":{
+                "code":"Product_E_00030",
+                "message":"Exceeds the product descrption field length. Only 3000 characters are allowed."
+            },
+            "vendorNameMaxLength":{
+                   "code":"Product_E_00031",
+                "message":"Exceeds the vendor name field length. Only 255 characters are allowed."
+            },
+            "vendorDescrptionMaxLengthError":{
+                 "code":"Product_E_00032",
+                "message":"Exceeds the descrption field length. Only 3000 characters are allowed."
+            },
+            "vendorContactNumberMaxLengthError":{
+                "code":"Product_E_00033",
+                "message":"Exceeds the phone number field length. Only 255 characters are allowed."
+            },
+            "productSizeNameMaxLengthError":{
+                "code":"Product_E_00034",
+                 "message":"Exceeds the product size name  field length. Only 255 characters are allowed."
+            },
+            "productSizeMaxLengthError":{
+                "code":"Product_E_00035",
+               "message":"Exceeds the category description field length. Only 3000 characters are allowed."
+           },
+           "flavorNameMaxLengthError":{
+            "code":"Product_E_00036",
+            "message":"Exceeds the flavour size name  field length. Only 255 characters are allowed."
+           },
+           "flavoirNameFieldError":{
+            "code":"Product_E_00037",
+            "message":"Flavour size name field is mandatory."
+           },
+           "stockInCommentsMaxLengthError":{
+             "code":"Product_E_00038",
+               "message":"Exceeds the comments  field length. Only 3000 characters are allowed."
+           },
+           "vendorNotExitsError":{
+            "code":"Product_E_00039",
+            "message":"Vendor details are not found."
+           },
+           "productNotExitsError":{
+            "code":"Product_E_00040",
+            "message":"Product details are not found."
+           },
+           "categoryNotExitsError":{
+            "code":"Product_E_00041",
+            "message":"Category details are not found."
+           },
+           "salesRateFieldError":{
+            "code":"Product_E_00042",
+            "message":"Sales rate field is mandatory."
+           },
+           "descriptionFieldError":{
+             "code":"Product_E_00044",
+            "message":"Descrption field is mandatory."
+           },
+           "startDateError":{
+            "code":"Product_E_00045",
+            "message":"Start date must be less than end date."
+           },
+           "endDateError":{
+            "code":"Product_E_00046",
+            "message":"End date must be greater than start date."
+           },
+           "gtinMaxNumberError":{
+            "code":"Product_E_00047",
+            "message":"Exceeds the GTIN field length. Only 13 characters are allowed."
+           }
+            
+            
+        }
+    },
+    "user":{
+        "login":{
+            "code":"User_S_00001",
+            "message":"Login successful."
+        },
+        "logOutUser":{
+            "code":"User_S_00002",
+            "message":"Logged out successfully."
+        }, 
+        "passwordChanged":{
+            "code":"USER_S_00003",
+            "message":"Password reset successfully."
+        },
+        "userError":{
+              "userNotFound":{
+            "code":"USER_E_00001",
+            "message":"User not found."
+        },
+        "oldPasswordError":{
+            "code":"USER_E_00002",
+            "message":"Previous password cannot be same as the new password."
+        },
+        "passwordAndConfirmPasswordError":{
+                "code":"USER_E_00003",
+                "message":"Password and confirm password must be the same."
+            },
+        "logOutUser" : {
+        "message":"Unauthorized access. Please login with authorized credentials.",
+        "code" : "USER_E_00004"
+            },
+            "loginError":{
+                "code":"USER_E_00005",
+                "message":"Invalid credential."
+            },
+            "weekPasswordError":{
+                "message":"Week password entered. Please use a strong password at least 8 chars required.",
+                "code":"USER_E_00006"
+            },
+            "passwordFileError":{
+                "message":"Password field is  mandatory.",
+                "code":"USER_E_00007"
+            },
+            "confirmPasswordFileError":{
+                "message":"Confirm password field is  mandatory.",
+                "code":"USER_E_00008"
+            },
+            "emailAlReadyExits":{
+                "code":"USER_E_00009",
+                "message":"Email already exist. Try with different Email."
+            },
+            "nameFieldError":{
+                 "message":"Name field is  mandatory.",
+                "code":"USER_E_00010"
+            },
+            "emailError":{
+                "code":"USER_E_00011",
+                "message":"Please enter a valid email address."
+            },
+            "tokenExpiredError": {
+                "code": "USER_E_00012",
+                "message": "Session expired. Please login."
+            },
+            "passworMustBe6length":{
+                "code":"User_E_00013",
+                "message":"Password must be at least 6 characters long."
+            }
+        }
+      
+    },
+    "sales":{
+        "getBarcodeDetails":{
+            "code":"SALES_S_00001",
+            "message":""
+        },
+        "salesCreateMessage":{
+            "code":"SALES_S_00002",
+            "message":"Sales transaction completed successfully."
+        },
+        "salesCancelSucess":{
+            "code":"SALES_S_00003",
+            "message":"Invoice cancelled successfully."
+        },
+        "salesWithClubMemberMessage":{
+            "code":"SALES_S_00004",
+            "message":"Sales transaction completed successfully & Member registration was successfully completed."
+        },
+        "invoiceSendEmail": {
+            "code": "SALES_S_00005",
+            "message": "Email has been successfully sent to"
+        },
+        "salesError":{
+            "customer_nameError":{
+                "code":"SALES_E_00001",
+                "message":"Customer first name field is mandatory."
+            },
+            "customer_addressError":{
+                "code":"SALES_E_00002",
+                "message":"Customer address field is mandatory."
+            },
+            "subTotalError":{
+                "code":"SALES_E_00003",
+                 "message":"Please enter a sales rate greater than 0."
+            },
+            "tax_totalError":{
+                  "code":"SALES_E_00004",
+                 "message":"Please enter a sales rate greater than 0."
+            },
+            "totalError":{
+                 "code":"SALES_E_00005",
+                 "message":"Please enter a sales rate greater than 0."
+            },
+            "currencyError":{
+                "code":"SALES_E_00006",
+                "message":"Currency not exit."
+            },
+            "currencyIsEmpty":{
+                 "code":"SALES_E_00007",
+                "message":"Currency field is mandatory."
+            },
+            "customerEmailError":{
+                "code":"SALES_E_00008",
+                "message":"Customer email field is mandatory."
+            },
+            "vendorNameAlreadyExits":{
+                  "code":"SALES_E_00009",
+                "message":"Customer name already exits."
+            },
+            "barcode_detailsError":{
+                "code":"SALES_E_00010",
+                "message":"Barcode details not found."
+            },
+            "customerEmailValid":{
+                "code":"SALES_E_00011",
+                "message":"Please enter a valid email address."
+            },
+            "salesCancelAlreadyDoneError":{
+                "code":"SALES_E_00012",
+                "message":"Sale has already been canceled. Unable to process the request."
+            },
+            "salesReasonMinimumLengthError":{
+                "code" :"SALES_E_00013",
+                "message":"Minimum 3 characters required."
+            },
+            "salesReasonEmptyError":{
+                  "code" :"SALES_E_00015",
+                "message":"Reason field is mandatory."
+            },
+            "purshchaseQuantityError":{
+                "code":"SALES_E_00016",
+                "message":"Entered quantity not available."
+            },
+            "modeOfPaymentError":{
+                "code":"SALES_E_00017",
+                "message":"Please choose a mode of payment."
+            },
+            "transactionIderror":{
+                "code":"SALES_E_00018",
+                "message":"Transaction id field is mandatory."
+            },
+            "modeOfPaymentNotExit":{
+                "code":"SALES_E_00019",
+                "message":"Please select the correct mode of payment."
+            },
+            "BarcodeLengthError":{
+                "code":"SALES_E_00020",
+                 "message":"Please enter 3 digit barcode number."
+            },
+            "customerLastNameError":{
+                "code":"SALES_E_00021", 
+                 "message":"Customer last name field is mandatory."
+            },
+            "salesDateError":{
+                "code" : "SALES_E_00022",
+                "message":"Sales date field is mandatory."
+            },
+            "discountPrecentageError":{
+                "code" : "SALES_E_00023",
+                "message":"The discount exceeds the limit. Only 100% is allowed."
+            },
+            "transactionIderrorMaxLengthError":{
+                "code":"SALES_E_00024",
+                "message":"The transaction ID exceeds the maximum limit. Only 255 characters are allowed."
+            },
+            "roundOffValueError":{
+                "code":"SALES_E_00025",
+                "message":"The rounded value should not exceed 0.999."
+            },
+            "customerAddressMaxLengthError":{
+                "code" :"SALES_E_00026",
+                "message":"Exceeds the address field length. Only 3000 characters are allowed."
+            },
+            "salesCancelMaxError":{
+                "code" :"SALES_E_00027",
+                "message":"Exceeds the reason field length. Only 3000 characters are allowed."
+            },
+            "salesEmailFieldError": {
+                "code": "SALES_E_00028",
+                "message": "Email field is mandatory."
+            }
+        }
+    },
+    "ClubMember":{
+        "clubMemberActivateMail":{
+            "code" : "CLUB_S_00001",
+            "message":"The member detail has been successfully registered. An activation link has been sent to the given email."
+        },
+        "clubMemberActivated":{
+            "code":"CLUB_S_00002",
+           "message":"The member details have been successfully updated."
+        },
+        "clubMemberInitiated":{
+            "code":"CLUB_S_00003",
+            "message":"The member registration has been successfully completed."
+        },
+        "clubMemerError":{
+            "ClubMemberPhoneNumberError":{
+                "code":"CLUB_E_00001",
+                "message":"Phone number field is mandatory."
+            },
+            "professionError":{
+                "code":"CLUB_E_00002",
+                "message":"Profession field is mandatory."
+            },
+            "firstNameError":{
+                "code":"CLUB_E_00003",
+                 "message":"First name field is mandatory."
+            },
+            "lastNameError":{
+                "code":"CLUB_E_00004",
+                "message":"Last name field is mandatory."
+            },
+            "favouriteError":{
+                "code":"CLUB_E_00005",
+                "message":"Please choose at least one of your favorite scents."
+            },
+            "languageError":{
+                "code":"CLUB_E_00006",
+                "message":"Please choose at least one of your language."
+            },
+            "termsAndConditionError":{
+                "code":"CLUB_E_00007",
+                "message":"Please agree to the terms and conditions."
+            },
+            "promotionalEmailError":{
+                "code":"CLUB_E_00008",
+                "message":"Please agree to the promotional emails."
+            },
+            "noAblicationError":{
+                "code":"CLUB_E_00009",
+                "message":"Please agree to the no obligations."
+            },
+            "activetMemberError":{
+                "code":"CLUB_E_00010",
+                "message":"Active member cannot be reactivated."
+            },
+            "memberActivationError":{
+                "code":"CLUB_E_00011",
+                "message":"Please activate your membership account."
+            },
+            "firstNameLengthError":{
+                "code":"CLUB_E_00012",
+                "message":"The first name field requires a minimum of 3 characters."
+            },
+            "lastNameLengthError":{
+                "code":"CLUB_E_00013",
+                "message":"The last name field requires a minimum of 1 characters."
+            },
+            "clubMemberNotFountError":{
+                "code":"CLUB_E_00014",
+                "message":"No club member found."
+            },
+            "activetMemberDidnotEditDetailsError":{
+                "code":"CLUB_E_00015",
+                "message":"This is an active member, and their details cannot be updated."
+            },
+            "firstNameMaxLengthError":{
+              "code":"CLUB_E_00020",
+              "message"  :"Exceeds the first name field length. Only 255 characters are allowed."
+            },
+            "LastNameMaxLengthError":{
+                "code":"CLUB_E_00021",
+                "message":"Exceeds the last name field length. Only 255 characters are allowed."
+              },
+              "emailLengthMaxError":{
+                "code":"CLUB_E_00022",
+                "message":"Exceeds the email field length. Only 255 characters are allowed."
+              },
+              "onlineStoreNumberMaxError":{
+                "code":"CLUB_E_00023",
+                "message":"Exceeds the online store number field length. Only 255 characters are allowed."
+              },
+              "onlineStoreNumberEmpltError":{
+                "code":"CLUB_E_00024",
+                "message":"Currently, the online store number field is mandatory."
+              },
+              "customerPhoneNUmberError":{
+                "code":"CLUB_E_00025",
+                "message":"Exceeds the online phone number field length. Only 255 characters are allowed."
+              },
+              "professionMaxLengthError":{
+                  "code":"CLUB_E_00026",
+                "message":"Exceeds the profession field length. Only 255 characters are allowed."
+              }
+        }
+       
+    },
+    "reseller":{
+        "resellerCreated":{
+            "code":"RESELLER_S_00001",
+            "message":"Reseller details successfully saved."
+        },
+        "getAllReseler":{
+            "code":"RESELLER_S_00002",
+            "message":""
+        },
+        "stockMovedMessage":{
+            "code":"RESELLER_S_00003",
+            "message":"Stock moved successfully."
+        },
+        "resellerSalesSucess":{
+            "code":"RESELLER_S_00004",
+            "message":"Reseller sales details have been successfully saved."
+        },
+        "resellerSalesCancel":{
+            "code":"RESELLER_S_00005",
+            "message":"Reseller Invoice cancelled successfully."
+        },
+        "changeResellerPassword" : {
+            "code" : "RESELLER_S_00006",
+            "message": "Password changed successfully."
+        },
+        "reselelrStockRequest":{
+             "code" : "RESELLER_S_00007",
+            "message": "Order requested successfully."
+        },
+        "resellerRequestApproved":{
+            "code":"RESELLER_S_00008",
+            "message":"Order request approved successfully."
+        },
+        "resellerReturnRequest":{
+             "code":"RESELLER_S_0009",
+            "message":"Stock return requested successfully."
+        },
+        "adminAcceptReturnRequest":{
+            "code":"RESELLER_S_0010",
+            "message":"Stock return approved successfully."
+        },
+        "adminReturnStock":{
+            "code":"RESELLER_S_0011",
+            "message":"Stock returned successfully."
+        },
+        "moveStockSucess":{
+            "code":"RESELLER_S_0012",
+            "message":"Invoice created successfully."
+        },
+        "resellerSalesCompleted":{
+            "code":"RESELLER_S_0013",
+            "message":"Reseller sales transaction completed successfully."
+        },
+
+        "resellerError":{
+            "nameError":{
+                "code":"RESELLER_E_00001",
+                "message":"Reseller name field is mandatory."
+            },
+            "resellerEmailFieldError":{
+                "code":"RESELLER_E_00002",
+                "message":"Reseller email field is mandatory."
+            },
+            "resellerEmailAllreadyExtis":{
+                "code":"RESELLER_E_00003",
+                "message":"Reseller email already exists."
+            },
+            "commisionPercentageError":{
+                "code":"RESELLER_E_00004",
+                "message":"Commision percentage field is mandatory."
+            },
+            "resellerNameMaxLengthError":{
+                "code":"RESELLER_E_00005",
+                "message":"Exceeds the name field length. Only 255 characters are allowed."
+            },
+            "resellerAddressMaxLengthError":{
+                "code":"RESELLER_E_00006",
+                "message":"Exceeds the address field length. Only 3000 characters are allowed."
+            },
+            "resellerDetailsNotFound":{
+                "code":"RESELLER_E_00007",
+                "message":"Reseller details not found."
+            },
+            "resellerNotChooceError":{
+                "code":"RESELLER_E_00008",
+                "message":"Please choose correct reseller."
+            },
+            "currentPasswordInCorrect":{
+                "code":"RESELLER_E_00009",
+                "message":"Invalid current password."
+            },
+            "newPasswordRequired" : {
+                "code":"RESELLER_E_00010",
+                "message":"Please enter your new password."
+            },
+            "currentPasswordRequired" : {
+                "code":"RESELLER_E_00011",
+                "message":"Please enter your current password."
+            },
+            "currentAndNewPasswordMatch" : {
+                "code":"RESELLER_E_00012",
+                "message": "Your current password and new password cannot be the same."
+            },
+            "confirmPasswordRequired" : {
+                "code" : "RESELLER_E_00013",
+                "message" : "Please confirm your new password."
+            },
+            "newAndConfirmPasswordNotMatch": {
+                "code": "RESELLER_E_00014",
+                "message": "The new password and confirm password do not match. Please try again."
+            },
+            "resellerRequestAllReadySubmitError":{
+                "code":"RESELLER_E_00015",
+                "message":"This request has already been approved and cannot be submitted again."
+            },
+            "exceedRequestQuantityDBlimitError":{
+                "code":"RESELLER_E_00016",
+                "message":"Exceeded limit: The maximum quantity allowed is 2,147,483,647."
+            }
+        }
+    }
+}

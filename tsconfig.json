@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "target": "es2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./build",
+    "rootDir": "./",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "strict": false,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*.ts",    
+    "index.js",
+    "config/*.config.js" // for *.config.js files
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
