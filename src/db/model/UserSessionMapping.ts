@@ -1,39 +1,57 @@
-import { DataTypes, Model, ModelStatic, Optional, Sequelize } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 import sequelizeConnection from "../config";
 
 interface userSessionAttributes {
   userSessionId: number;
+  userSessionRefId: string;
+
   userId: number;
-  sessionId: number;
-  videoUrlId: number;
+  sessionId: string;
+
   status: number;
+
   createdBy: number;
-  updatedBy: number;
-  deletedBy: number;
+  updatedBy: number | null;
+  deletedBy: number | null;
+
   createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
 }
 
-export type userSessionInput = Optional<userSessionAttributes, "userSessionId">;
+export type userSessionInput = Optional<
+  userSessionAttributes,
+  | "userSessionId"
+  | "userSessionRefId"
+  | "status"
+  | "updatedBy"
+  | "deletedBy"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt"
+>;
 
 export type userSessionOutput = Required<userSessionAttributes>;
 
 class UserSessionMapping
-  extends Model<userSessionOutput, userSessionAttributes>
+  extends Model<userSessionOutput, userSessionInput>
   implements userSessionAttributes
 {
   declare userSessionId: number;
+  declare userSessionRefId: string;
+
   declare userId: number;
-  declare sessionId: number;
-  declare videoUrlId: number;
+  declare sessionId: string;
+
   declare status: number;
+
   declare createdBy: number;
-  declare updatedBy: number;
-  declare deletedBy: number;
+  declare updatedBy: number | null;
+  declare deletedBy: number | null;
+
   declare readonly createdAt: Date;
-  declare readonly updatedAt: Date;
-  declare readonly deletedAt: Date;
+  declare readonly updatedAt: Date | null;
+  declare readonly deletedAt: Date | null;
 }
 
 UserSessionMapping.init(
@@ -43,47 +61,66 @@ UserSessionMapping.init(
       primaryKey: true,
       autoIncrement: true,
     },
+
+    userSessionRefId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      unique: true,
+      defaultValue: DataTypes.UUIDV4,
+    },
+
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
+
     sessionId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
     },
-    videoUrlId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+
     status: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      defaultValue: 1,
     },
+
     createdBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
+
     updatedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
     },
+
     deletedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
     },
+
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     updatedAt: {
       type: DataTypes.DATE,
+      allowNull: true,
     },
+
     deletedAt: {
       type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {
     sequelize: sequelizeConnection,
     tableName: "user_session_mapping",
     paranoid: true,
+    // timestamps: true,
+    // underscored: true,
   },
 );
 

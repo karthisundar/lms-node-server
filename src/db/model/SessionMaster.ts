@@ -6,13 +6,17 @@ export interface sessionMasterAttributes {
   sessionRefId: string;
   sessionCode: string;
   sessionName: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
+  description: string | null;
+  startDate: Date | null;
+  endDate: Date | null;
   status: string;
+
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt: Date | null;
   deletedAt: Date | null;
+  createdBy: number | null;
+  updatedBy: number | null;
+  deletedBy: number | null;
 }
 
 export type sessionMasterInput = Optional<
@@ -27,6 +31,9 @@ export type sessionMasterInput = Optional<
   | "createdAt"
   | "updatedAt"
   | "deletedAt"
+  | "createdBy"
+  | "updatedBy"
+  | "deletedBy"
 >;
 
 export type sessionMasterOutput = Required<sessionMasterAttributes>;
@@ -39,14 +46,17 @@ class SessionMaster
   declare sessionRefId: string;
   declare sessionCode: string;
   declare sessionName: string;
-  declare description: string;
-  declare startDate: Date;
-  declare endDate: Date;
+  declare description: string | null;
+  declare startDate: Date | null;
+  declare endDate: Date | null;
   declare status: string;
 
   declare readonly createdAt: Date;
-  declare readonly updatedAt: Date;
+  declare readonly updatedAt: Date | null;
   declare readonly deletedAt: Date | null;
+  declare createdBy: number | null;
+  declare updatedBy: number | null;
+  declare deletedBy: number | null;
 }
 
 SessionMaster.init(
@@ -62,20 +72,17 @@ SessionMaster.init(
       allowNull: false,
       unique: true,
       defaultValue: DataTypes.UUIDV4,
-      field: "session_ref_id",
     },
 
     sessionCode: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
-      field: "session_code",
+      // unique: true,
     },
 
     sessionName: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: "session_name",
     },
 
     description: {
@@ -86,13 +93,11 @@ SessionMaster.init(
     startDate: {
       type: DataTypes.DATE,
       allowNull: true,
-      field: "start_date",
     },
 
     endDate: {
       type: DataTypes.DATE,
       allowNull: true,
-      field: "end_date",
     },
 
     status: {
@@ -104,19 +109,31 @@ SessionMaster.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      field: "created_at",
     },
 
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
-      field: "updated_at",
     },
 
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
-      field: "deleted_at",
+    },
+
+    createdBy: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
+    },
+
+    updatedBy: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
+    },
+
+    deletedBy: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
     },
   },
   {
@@ -124,7 +141,7 @@ SessionMaster.init(
     tableName: "sessions",
     paranoid: true,
     timestamps: true,
-    underscored: true,
+    // underscored: true,
   },
 );
 

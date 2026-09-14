@@ -4,6 +4,7 @@ import sequelizeConnection from "../config";
 interface bucketMasterAttributes {
   bucketId: number;
   bucketName: string;
+  bucketRefId: string;
   serviceUrl: string;
   status: number;
   createdAt: Date;
@@ -20,6 +21,7 @@ class BucketMaster
   implements bucketMasterAttributes
 {
   declare bucketId: number;
+  declare bucketRefId: string;
   declare bucketName: string;
   declare serviceUrl: string;
   declare status: number;
@@ -34,6 +36,10 @@ BucketMaster.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+    },
+    bucketRefId: {
+      type: DataTypes.STRING,
+      defaultValue: DataTypes.UUIDV4,
     },
     bucketName: {
       type: DataTypes.STRING,
