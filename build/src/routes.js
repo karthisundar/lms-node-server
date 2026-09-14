@@ -6,10 +6,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = registerRoutes;
 const express_1 = require("express");
 const user_controller_1 = __importDefault(require("./components/user/user.controller"));
+const bucket_controller_1 = require("./components/bucket/bucket.controller");
+const session_controller_1 = require("./components/session/session.controller");
+const video_controller_1 = require("./components/video/video.controller");
 function registerRoutes() {
     const router = (0, express_1.Router)();
     const userController = new user_controller_1.default();
-    router.use('/api/user', userController.register());
+    router.use("/api/user", userController.register());
+    const bucketController = new bucket_controller_1.BucketController();
+    router.use("/api/bucketMaster", bucketController.register());
+    const sessionController = new session_controller_1.SessionController();
+    router.use("/api/sessionMaster", sessionController.register());
+    const videoController = new video_controller_1.VideoController();
+    router.use("/api/video", videoController.register());
     return router;
 }
 //# sourceMappingURL=routes.js.map

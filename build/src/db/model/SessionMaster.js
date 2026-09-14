@@ -18,18 +18,15 @@ SessionMaster.init({
         allowNull: false,
         unique: true,
         defaultValue: sequelize_1.DataTypes.UUIDV4,
-        field: "session_ref_id",
     },
     sessionCode: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
-        unique: true,
-        field: "session_code",
+        // unique: true,
     },
     sessionName: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
-        field: "session_name",
     },
     description: {
         type: sequelize_1.DataTypes.TEXT,
@@ -38,12 +35,10 @@ SessionMaster.init({
     startDate: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: true,
-        field: "start_date",
     },
     endDate: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: true,
-        field: "end_date",
     },
     status: {
         type: sequelize_1.DataTypes.STRING,
@@ -53,24 +48,33 @@ SessionMaster.init({
     createdAt: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: false,
-        field: "created_at",
     },
     updatedAt: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: true,
-        field: "updated_at",
     },
     deletedAt: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: true,
-        field: "deleted_at",
+    },
+    createdBy: {
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+    },
+    updatedBy: {
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+    },
+    deletedBy: {
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
     },
 }, {
     sequelize: config_1.default,
     tableName: "sessions",
     paranoid: true,
     timestamps: true,
-    underscored: true,
+    // underscored: true,
 });
 exports.default = SessionMaster;
 //# sourceMappingURL=SessionMaster.js.map

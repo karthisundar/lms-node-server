@@ -13,8 +13,30 @@ VideoMaster.init({
         primaryKey: true,
         autoIncrement: true,
     },
+    videoRefId: {
+        type: sequelize_1.DataTypes.UUID,
+        allowNull: false,
+        unique: true,
+        defaultValue: sequelize_1.DataTypes.UUIDV4,
+    },
+    title: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+    },
+    filename: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+    },
+    url: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: false,
+    },
+    sessionId: {
+        type: sequelize_1.DataTypes.UUID,
+        allowNull: false,
+    },
     bucketId: {
-        type: sequelize_1.DataTypes.INTEGER,
+        type: sequelize_1.DataTypes.UUID,
         allowNull: false,
     },
     createdAt: {
@@ -23,14 +45,30 @@ VideoMaster.init({
     },
     updatedAt: {
         type: sequelize_1.DataTypes.DATE,
+        allowNull: true,
     },
     deletedAt: {
         type: sequelize_1.DataTypes.DATE,
+        allowNull: true,
+    },
+    createdBy: {
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+    },
+    updatedBy: {
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+    },
+    deletedBy: {
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
     },
 }, {
-    paranoid: true,
     sequelize: config_1.default,
     tableName: "video_master",
+    paranoid: true,
+    // timestamps: true,
+    // underscored: true,
 });
 exports.default = VideoMaster;
 //# sourceMappingURL=VideoMaster.js.map

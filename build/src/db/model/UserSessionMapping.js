@@ -13,31 +13,36 @@ UserSessionMapping.init({
         primaryKey: true,
         autoIncrement: true,
     },
+    userSessionRefId: {
+        type: sequelize_1.DataTypes.UUID,
+        allowNull: false,
+        unique: true,
+        defaultValue: sequelize_1.DataTypes.UUIDV4,
+    },
     userId: {
-        type: sequelize_1.DataTypes.INTEGER,
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
     },
     sessionId: {
-        type: sequelize_1.DataTypes.INTEGER,
-        allowNull: false,
-    },
-    videoUrlId: {
-        type: sequelize_1.DataTypes.INTEGER,
+        type: sequelize_1.DataTypes.UUID,
         allowNull: false,
     },
     status: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
+        defaultValue: 1,
     },
     createdBy: {
-        type: sequelize_1.DataTypes.INTEGER,
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
     },
     updatedBy: {
-        type: sequelize_1.DataTypes.INTEGER,
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
     },
     deletedBy: {
-        type: sequelize_1.DataTypes.INTEGER,
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
     },
     createdAt: {
         type: sequelize_1.DataTypes.DATE,
@@ -45,14 +50,18 @@ UserSessionMapping.init({
     },
     updatedAt: {
         type: sequelize_1.DataTypes.DATE,
+        allowNull: true,
     },
     deletedAt: {
         type: sequelize_1.DataTypes.DATE,
+        allowNull: true,
     },
 }, {
     sequelize: config_1.default,
     tableName: "user_session_mapping",
     paranoid: true,
+    // timestamps: true,
+    // underscored: true,
 });
 exports.default = UserSessionMapping;
 //# sourceMappingURL=UserSessionMapping.js.map

@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSession = void 0;
+exports.deleteUserSessionMapping = exports.getUserSessionMapping = exports.getAllUserSessionMappings = exports.createUserSessionMapping = exports.deleteSession = exports.getSession = exports.getAllSessions = exports.createSession = void 0;
 const dal = __importStar(require("../../db/dal/session"));
 const jwt_utils_1 = require("../auth/jwt.utils");
 const createSession = async (params, token) => {
@@ -41,4 +41,39 @@ const createSession = async (params, token) => {
     return createSession;
 };
 exports.createSession = createSession;
+const getAllSessions = async (params) => {
+    const getAllSessions = await dal.getAllSessions(params);
+    return getAllSessions;
+};
+exports.getAllSessions = getAllSessions;
+const getSession = async (params) => {
+    const getSession = await dal.getSession(params);
+    return getSession;
+};
+exports.getSession = getSession;
+const deleteSession = async (params, token) => {
+    const deleteSession = await dal.deleteSession(params, await (0, jwt_utils_1.verifyJWT)(token)?.payload);
+    return deleteSession;
+};
+exports.deleteSession = deleteSession;
+const createUserSessionMapping = async (params, token) => {
+    const createUserSessionMapping = await dal.createUserSessionMapping(params, await (0, jwt_utils_1.verifyJWT)(token)?.payload);
+    return createUserSessionMapping;
+};
+exports.createUserSessionMapping = createUserSessionMapping;
+const getAllUserSessionMappings = async (params, token) => {
+    const getAllUserSessionMappings = await dal.getAllUserSessionMappings(params, await (0, jwt_utils_1.verifyJWT)(token)?.payload);
+    return getAllUserSessionMappings;
+};
+exports.getAllUserSessionMappings = getAllUserSessionMappings;
+const getUserSessionMapping = async (params, token) => {
+    const getUserSessionMapping = await dal.getUserSessionMapping(params, await (0, jwt_utils_1.verifyJWT)(token)?.payload);
+    return getUserSessionMapping;
+};
+exports.getUserSessionMapping = getUserSessionMapping;
+const deleteUserSessionMapping = async (params, token) => {
+    const deleteUserSessionMapping = await dal.deleteUserSessionMapping(params?.userSessionRefId, await (0, jwt_utils_1.verifyJWT)(token)?.payload);
+    return deleteUserSessionMapping;
+};
+exports.deleteUserSessionMapping = deleteUserSessionMapping;
 //# sourceMappingURL=session.service.js.map

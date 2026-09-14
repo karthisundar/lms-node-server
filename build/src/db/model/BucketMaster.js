@@ -13,6 +13,10 @@ BucketMaster.init({
         primaryKey: true,
         autoIncrement: true,
     },
+    bucketRefId: {
+        type: sequelize_1.DataTypes.STRING,
+        defaultValue: sequelize_1.DataTypes.UUIDV4,
+    },
     bucketName: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
