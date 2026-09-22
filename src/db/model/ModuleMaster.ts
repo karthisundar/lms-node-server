@@ -11,7 +11,7 @@ export interface moduleMasterAttributes {
   moduleName: string;
   description: string | null;
 
-  sequenceNo: number;
+  displayOrder: number;
   status: string;
 
   createdBy: number;
@@ -28,8 +28,9 @@ export type moduleMasterInput = Optional<
   | "moduleId"
   | "moduleRefId"
   | "description"
-  | "sequenceNo"
+  | "displayOrder"
   | "status"
+  | "createdBy"
   | "updatedBy"
   | "deletedBy"
   | "createdAt"
@@ -39,10 +40,10 @@ export type moduleMasterInput = Optional<
 
 export type moduleMasterOutput = Required<moduleMasterAttributes>;
 
-class ModuleMaster extends Model<
-  moduleMasterOutput,
-  moduleMasterInput
-> implements moduleMasterAttributes {
+class ModuleMaster
+  extends Model<moduleMasterOutput, moduleMasterInput>
+  implements moduleMasterAttributes
+{
   declare moduleId: number;
   declare moduleRefId: string;
 
@@ -52,7 +53,7 @@ class ModuleMaster extends Model<
   declare moduleName: string;
   declare description: string | null;
 
-  declare sequenceNo: number;
+  declare displayOrder: number;
   declare status: string;
 
   declare createdBy: number;
@@ -85,12 +86,13 @@ ModuleMaster.init(
     },
 
     moduleCode: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
 
     moduleName: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false,
     },
 
@@ -99,14 +101,14 @@ ModuleMaster.init(
       allowNull: true,
     },
 
-    sequenceNo: {
-      type: DataTypes.INTEGER.UNSIGNED,
+    displayOrder: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,
     },
 
     status: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING,
       allowNull: false,
       defaultValue: "draft",
     },
@@ -129,7 +131,6 @@ ModuleMaster.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
 
     updatedAt: {

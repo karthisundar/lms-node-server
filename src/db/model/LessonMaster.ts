@@ -5,13 +5,16 @@ export interface lessonMasterAttributes {
   lessonId: number;
   lessonRefId: string;
 
-  moduleId: number;
+  moduleRefId: string;
 
   lessonCode: string;
   lessonName: string;
   description: string | null;
 
-  sequenceNo: number;
+  videoRefId: string | null;
+  notes: string | null;
+
+  displayOrder: number;
   status: string;
 
   createdBy: number;
@@ -28,8 +31,11 @@ export type lessonMasterInput = Optional<
   | "lessonId"
   | "lessonRefId"
   | "description"
-  | "sequenceNo"
+  | "videoRefId"
+  | "notes"
+  | "displayOrder"
   | "status"
+  | "createdBy"
   | "updatedBy"
   | "deletedBy"
   | "createdAt"
@@ -39,20 +45,24 @@ export type lessonMasterInput = Optional<
 
 export type lessonMasterOutput = Required<lessonMasterAttributes>;
 
-class LessonMaster extends Model<
-  lessonMasterOutput,
-  lessonMasterInput
-> implements lessonMasterAttributes {
+class LessonMaster
+  extends Model<lessonMasterOutput, lessonMasterInput>
+  implements lessonMasterAttributes
+{
   declare lessonId: number;
+
   declare lessonRefId: string;
 
-  declare moduleId: number;
+  declare moduleRefId: string;
 
   declare lessonCode: string;
   declare lessonName: string;
   declare description: string | null;
 
-  declare sequenceNo: number;
+  declare videoRefId: string | null;
+  declare notes: string | null;
+
+  declare displayOrder: number;
   declare status: string;
 
   declare createdBy: number;
@@ -79,18 +89,19 @@ LessonMaster.init(
       defaultValue: DataTypes.UUIDV4,
     },
 
-    moduleId: {
-      type: DataTypes.INTEGER.UNSIGNED,
+    moduleRefId: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
 
     lessonCode: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
 
     lessonName: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false,
     },
 
@@ -99,14 +110,24 @@ LessonMaster.init(
       allowNull: true,
     },
 
-    sequenceNo: {
-      type: DataTypes.INTEGER.UNSIGNED,
+    videoRefId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
+
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    displayOrder: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,
     },
 
     status: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING,
       allowNull: false,
       defaultValue: "draft",
     },
@@ -129,7 +150,6 @@ LessonMaster.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
 
     updatedAt: {
@@ -144,8 +164,11 @@ LessonMaster.init(
   },
   {
     sequelize: sequelizeConnection,
+
     tableName: "lesson_master",
+
     paranoid: true,
+
     timestamps: true,
   },
 );
