@@ -208,7 +208,7 @@ export const getSession = async (sessionRefId: string): Promise<any> => {
 
     const session = await SessionMaster.findOne({
       where: {
-        sessionRefId,
+        sessionRefId: sessionRefId,
       },
     });
 
@@ -218,7 +218,12 @@ export const getSession = async (sessionRefId: string): Promise<any> => {
 
     return session;
   } catch (error) {
-    logger.error("Error getSession/sessionMaster.ts", error);
+    logger.error("Error getSession/sessionMaster.ts", {
+      sessionRefId,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
     throw error;
   }
 };
@@ -465,7 +470,6 @@ export const createUserSessionMapping = async (
   }
 };
 
-
 export const getAllUserSessionMappings = async (
   queryData: any,
   payload: any,
@@ -570,7 +574,6 @@ export const getAllUserSessionMappings = async (
     throw error;
   }
 };
-
 
 export const getUserSessionMapping = async (
   userSessionRefId: string,

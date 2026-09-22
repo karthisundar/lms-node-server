@@ -47,7 +47,7 @@ const getAllSessions = async (params) => {
 };
 exports.getAllSessions = getAllSessions;
 const getSession = async (params) => {
-    const getSession = await dal.getSession(params);
+    const getSession = await dal.getSession(params?.sessionRefId);
     return getSession;
 };
 exports.getSession = getSession;

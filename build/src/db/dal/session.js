@@ -185,7 +185,7 @@ const getSession = async (sessionRefId) => {
         }
         const session = await SessionMaster_1.default.findOne({
             where: {
-                sessionRefId,
+                sessionRefId: sessionRefId,
             },
         });
         if (!session) {
@@ -194,7 +194,11 @@ const getSession = async (sessionRefId) => {
         return session;
     }
     catch (error) {
-        logger_1.default.error("Error getSession/sessionMaster.ts", error);
+        logger_1.default.error("Error getSession/sessionMaster.ts", {
+            sessionRefId,
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+        });
         throw error;
     }
 };

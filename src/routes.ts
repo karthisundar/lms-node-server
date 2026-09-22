@@ -3,6 +3,7 @@ import UserController from "./components/user/user.controller";
 import { BucketController } from "./components/bucket/bucket.controller";
 import { SessionController } from "./components/session/session.controller";
 import { VideoController } from "./components/video/video.controller";
+import { CourseController } from "./components/course/course.controller";
 
 export default function registerRoutes(): Router {
   const router = Router();
@@ -18,6 +19,9 @@ export default function registerRoutes(): Router {
 
   const videoController = new VideoController();
   router.use("/api/video", videoController.register());
+
+  const courseController = new CourseController();
+  router.use("api/course", courseController.register());
 
   return router;
 }

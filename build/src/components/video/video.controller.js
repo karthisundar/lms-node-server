@@ -50,6 +50,8 @@ class VideoController extends BaseApi_1.default {
         this.router.get("/getAllVideos", this.getAllVideos.bind(this));
         this.router.get("/getVideo", this.getVideo.bind(this));
         this.router.post("/deleteVideo", this.deleteVideo.bind(this));
+        this.router.get("/getVideoProgress", this.getVideoProgress.bind(this));
+        this.router.post("/createVideoProgress", this.createVideoProgress.bind(this));
         return this.router;
     }
     async createVideo(req, res, next) {
@@ -86,6 +88,26 @@ class VideoController extends BaseApi_1.default {
         try {
             const createVideo = await service.deleteVideo(req.body, req.headers.authorization);
             res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", createVideo);
+            super.send(res);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async createVideoProgress(req, res, next) {
+        try {
+            const createVideoProgress = await service.createVideoProgress(req.body, req.headers.authorization);
+            res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", createVideoProgress);
+            super.send(res);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async getVideoProgress(req, res, next) {
+        try {
+            const getVideoProgress = await service.getVideoProgress(req.query?.videoRefId, req.headers.authorization);
+            res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", getVideoProgress);
             super.send(res);
         }
         catch (error) {

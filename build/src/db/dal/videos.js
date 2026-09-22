@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteVideo = exports.getVideo = exports.getAllVideos = exports.createVideo = void 0;
+exports.getVideoProgress = exports.createVideoProgress = exports.deleteVideo = exports.getVideo = exports.getAllVideos = exports.createVideo = void 0;
 const sequelize_1 = require("sequelize");
 const crypto_1 = require("crypto");
 const config_1 = __importDefault(require("../config"));
@@ -11,6 +11,8 @@ const VideoMaster_1 = __importDefault(require("../model/VideoMaster"));
 const user_1 = require("./user");
 const logger_1 = __importDefault(require("../../lib/logger"));
 const pagination_1 = require("../../components/util/pagination");
+const UserSessionMapping_1 = __importDefault(require("../model/UserSessionMapping"));
+const VideoWatchProgress_1 = __importDefault(require("../model/VideoWatchProgress"));
 const createVideo = async (queryData, payload) => {
     try {
         const videoRefId = queryData?.videoRefId?.trim();
@@ -242,4 +244,198 @@ const deleteVideo = async (videoRefId, payload) => {
     }
 };
 exports.deleteVideo = deleteVideo;
+const createVideoProgress = async (queryData, payload) => {
+    try {
+        const videoRefId = queryData?.videoRefId?.trim();
+        const lastWatchedDuration = Number(queryData?.lastWatchedDuration ?? 0);
+        const videoDuration = Number(queryData?.videoDuration ?? 0);
+        // =====================================================
+        // VALIDATION
+        // =====================================================
+        if (!videoRefId) {
+            throw new Error("VIDEO_E_00001");
+        }
+        if (Number.isNaN(lastWatchedDuration) || lastWatchedDuration < 0) {
+            throw new Error("VIDEO_E_00002");
+        }
+        if (Number.isNaN(videoDuration) || videoDuration < 0) {
+            throw new Error("VIDEO_E_00003");
+        }
+        // =====================================================
+        // GET LOGGED-IN USER
+        // =====================================================
+        const findUser = await (0, user_1.getActionUser)(payload?.user_ref_id);
+        if (!findUser?.user_id) {
+            throw new Error("USER_E_00001");
+        }
+        const userId = findUser.user_id;
+        // =====================================================
+        // GET VIDEO
+        // =====================================================
+        const video = await VideoMaster_1.default.findOne({
+            where: {
+                videoRefId,
+            },
+        });
+        if (!video) {
+            throw new Error("VIDEO_E_00001");
+        }
+        // =====================================================
+        // CHECK USER HAS SESSION ACCESS
+        // =====================================================
+        const userSession = await UserSessionMapping_1.default.findOne({
+            where: {
+                userId,
+                sessionId: video.sessionId,
+                status: 1,
+            },
+        });
+        if (!userSession) {
+            throw new Error("SESSION_E_00004");
+        }
+        // =====================================================
+        // CHECK COMPLETED
+        // =====================================================
+        const isCompleted = videoDuration > 0 && lastWatchedDuration >= videoDuration;
+        // =====================================================
+        // FIND EXISTING PROGRESS
+        // =====================================================
+        const existingProgress = await VideoWatchProgress_1.default.findOne({
+            where: {
+                userId,
+                videoId: video.videoId,
+            },
+        });
+        if (existingProgress) {
+            await config_1.default.transaction(async (transaction) => {
+                await existingProgress.update({
+                    lastWatchedDuration,
+                    videoDuration,
+                    isCompleted,
+                    updatedAt: new Date(),
+                }, {
+                    transaction,
+                });
+            });
+            return {
+                videoRefId: video.videoRefId,
+                videoId: video.videoId,
+                userId,
+                lastWatchedDuration,
+                videoDuration,
+                isCompleted,
+            };
+        }
+        // =====================================================
+        // CREATE NEW PROGRESS
+        // =====================================================
+        const progress = await config_1.default.transaction(async (transaction) => {
+            return await VideoWatchProgress_1.default.create({
+                videoWatchProgressRefId: (0, crypto_1.randomUUID)(),
+                userId,
+                videoId: video.videoId,
+                lastWatchedDuration,
+                videoDuration,
+                isCompleted,
+                createdAt: new Date(),
+                updatedAt: null,
+                deletedAt: null,
+            }, {
+                transaction,
+            });
+        });
+        return {
+            videoRefId: video.videoRefId,
+            videoId: video.videoId,
+            userId,
+            lastWatchedDuration: progress.lastWatchedDuration,
+            videoDuration: progress.videoDuration,
+            isCompleted: progress.isCompleted,
+        };
+    }
+    catch (error) {
+        logger_1.default.error("Error createVideoProgress/video.service.ts", error);
+        throw error;
+    }
+};
+exports.createVideoProgress = createVideoProgress;
+const getVideoProgress = async (videoRefId, payload) => {
+    try {
+        // =====================================================
+        // VALIDATION
+        // =====================================================
+        if (!videoRefId) {
+            throw new Error("VIDEO_E_00001");
+        }
+        // =====================================================
+        // GET LOGGED-IN USER
+        // =====================================================
+        const findUser = await (0, user_1.getActionUser)(payload?.user_ref_id);
+        if (!findUser?.user_id) {
+            throw new Error("USER_E_00001");
+        }
+        const userId = findUser.user_id;
+        // =====================================================
+        // GET VIDEO
+        // =====================================================
+        const video = await VideoMaster_1.default.findOne({
+            where: {
+                videoRefId,
+            },
+        });
+        if (!video) {
+            throw new Error("VIDEO_E_00001");
+        }
+        // =====================================================
+        // CHECK USER SESSION ACCESS
+        // =====================================================
+        const userSession = await UserSessionMapping_1.default.findOne({
+            where: {
+                userId,
+                sessionId: video.sessionId,
+                status: 1,
+            },
+        });
+        if (!userSession) {
+            throw new Error("SESSION_E_00004");
+        }
+        // =====================================================
+        // GET PROGRESS
+        // =====================================================
+        const progress = await VideoWatchProgress_1.default.findOne({
+            where: {
+                userId,
+                videoId: video.videoId,
+            },
+            order: [["videoWatchProgressId", "desc"]],
+        });
+        // =====================================================
+        // NO PROGRESS
+        // =====================================================
+        if (!progress) {
+            return {
+                videoRefId: video.videoRefId,
+                videoId: video.videoId,
+                lastWatchedDuration: 0,
+                videoDuration: 0,
+                isCompleted: false,
+            };
+        }
+        // =====================================================
+        // RETURN EXISTING PROGRESS
+        // =====================================================
+        return {
+            videoRefId: video.videoRefId,
+            videoId: video.videoId,
+            lastWatchedDuration: progress.lastWatchedDuration,
+            videoDuration: progress.videoDuration,
+            isCompleted: progress.isCompleted,
+        };
+    }
+    catch (error) {
+        logger_1.default.error("Error getVideoProgress/video.service.ts", error);
+        throw error;
+    }
+};
+exports.getVideoProgress = getVideoProgress;
 //# sourceMappingURL=videos.js.map

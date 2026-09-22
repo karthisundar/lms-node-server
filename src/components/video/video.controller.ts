@@ -15,6 +15,11 @@ export class VideoController extends BaseApi {
     this.router.get("/getAllVideos", this.getAllVideos.bind(this));
     this.router.get("/getVideo", this.getVideo.bind(this));
     this.router.post("/deleteVideo", this.deleteVideo.bind(this));
+    this.router.get("/getVideoProgress", this.getVideoProgress.bind(this));
+    this.router.post(
+      "/createVideoProgress",
+      this.createVideoProgress.bind(this),
+    );
     return this.router;
   }
 
@@ -73,6 +78,39 @@ export class VideoController extends BaseApi {
         req.headers.authorization,
       );
       res.locals.data = returnSuccess(StatusCodes.OK, "", createVideo);
+      super.send(res);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async createVideoProgress(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const createVideoProgress = await service.createVideoProgress(
+        req.body,
+        req.headers.authorization,
+      );
+      res.locals.data = returnSuccess(StatusCodes.OK, "", createVideoProgress);
+      super.send(res);
+    } catch (error) {
+      next(error);
+    }
+  }
+  public async getVideoProgress(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const getVideoProgress = await service.getVideoProgress(
+        req.query?.videoRefId,
+        req.headers.authorization,
+      );
+      res.locals.data = returnSuccess(StatusCodes.OK, "", getVideoProgress);
       super.send(res);
     } catch (error) {
       next(error);

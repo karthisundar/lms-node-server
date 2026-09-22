@@ -6,6 +6,8 @@ import VideoMaster from "../model/VideoMaster";
 import { getActionUser } from "./user";
 import logger from "../../lib/logger";
 import { paginationService } from "../../components/util/pagination";
+import UserSessionMapping from "../model/UserSessionMapping";
+import VideoWatchProgress from "../model/VideoWatchProgress";
 
 export const createVideo = async (
   queryData: any,
@@ -194,7 +196,6 @@ export const getAllVideos = async (queryData: any): Promise<any> => {
   }
 };
 
-
 export const getVideo = async (videoRefId: string): Promise<any> => {
   try {
     if (!videoRefId) {
@@ -283,6 +284,262 @@ export const deleteVideo = async (
     return true;
   } catch (error) {
     logger.error("Error deleteVideo/videoMaster.ts", error);
+    throw error;
+  }
+};
+export const createVideoProgress = async (
+  queryData: any,
+  payload: any,
+): Promise<any> => {
+  try {
+    const videoRefId = queryData?.videoRefId?.trim();
+
+    const lastWatchedDuration = Number(queryData?.lastWatchedDuration ?? 0);
+
+    const videoDuration = Number(queryData?.videoDuration ?? 0);
+
+    // =====================================================
+    // VALIDATION
+    // =====================================================
+
+    if (!videoRefId) {
+      throw new Error("VIDEO_E_00001");
+    }
+
+    if (Number.isNaN(lastWatchedDuration) || lastWatchedDuration < 0) {
+      throw new Error("VIDEO_E_00002");
+    }
+
+    if (Number.isNaN(videoDuration) || videoDuration < 0) {
+      throw new Error("VIDEO_E_00003");
+    }
+
+    // =====================================================
+    // GET LOGGED-IN USER
+    // =====================================================
+
+    const findUser = await getActionUser(payload?.user_ref_id);
+
+    if (!findUser?.user_id) {
+      throw new Error("USER_E_00001");
+    }
+
+    const userId = findUser.user_id;
+
+    // =====================================================
+    // GET VIDEO
+    // =====================================================
+
+    const video = await VideoMaster.findOne({
+      where: {
+        videoRefId,
+      },
+    });
+
+    if (!video) {
+      throw new Error("VIDEO_E_00001");
+    }
+
+    // =====================================================
+    // CHECK USER HAS SESSION ACCESS
+    // =====================================================
+
+    const userSession = await UserSessionMapping.findOne({
+      where: {
+        userId,
+        sessionId: video.sessionId,
+        status: 1,
+      },
+    });
+
+    if (!userSession) {
+      throw new Error("SESSION_E_00004");
+    }
+
+    // =====================================================
+    // CHECK COMPLETED
+    // =====================================================
+
+    const isCompleted =
+      videoDuration > 0 && lastWatchedDuration >= videoDuration;
+
+    // =====================================================
+    // FIND EXISTING PROGRESS
+    // =====================================================
+
+    const existingProgress = await VideoWatchProgress.findOne({
+      where: {
+        userId,
+        videoId: video.videoId,
+      },
+    });
+
+    if (existingProgress) {
+      await sequelizeConnection.transaction(
+        async (transaction: Transaction) => {
+          await existingProgress.update(
+            {
+              lastWatchedDuration,
+              videoDuration,
+              isCompleted,
+              updatedAt: new Date(),
+            },
+            {
+              transaction,
+            },
+          );
+        },
+      );
+
+      return {
+        videoRefId: video.videoRefId,
+        videoId: video.videoId,
+        userId,
+        lastWatchedDuration,
+        videoDuration,
+        isCompleted,
+      };
+    }
+
+    // =====================================================
+    // CREATE NEW PROGRESS
+    // =====================================================
+
+    const progress = await sequelizeConnection.transaction(
+      async (transaction: Transaction) => {
+        return await VideoWatchProgress.create(
+          {
+            videoWatchProgressRefId: randomUUID(),
+
+            userId,
+            videoId: video.videoId,
+
+            lastWatchedDuration,
+            videoDuration,
+
+            isCompleted,
+
+            createdAt: new Date(),
+            updatedAt: null,
+            deletedAt: null,
+          },
+          {
+            transaction,
+          },
+        );
+      },
+    );
+
+    return {
+      videoRefId: video.videoRefId,
+      videoId: video.videoId,
+      userId,
+      lastWatchedDuration: progress.lastWatchedDuration,
+      videoDuration: progress.videoDuration,
+      isCompleted: progress.isCompleted,
+    };
+  } catch (error) {
+    logger.error("Error createVideoProgress/video.service.ts", error);
+
+    throw error;
+  }
+};
+
+export const getVideoProgress = async (
+  videoRefId: string,
+  payload: any,
+): Promise<any> => {
+  try {
+    // =====================================================
+    // VALIDATION
+    // =====================================================
+
+    if (!videoRefId) {
+      throw new Error("VIDEO_E_00001");
+    }
+
+    // =====================================================
+    // GET LOGGED-IN USER
+    // =====================================================
+
+    const findUser = await getActionUser(payload?.user_ref_id);
+
+    if (!findUser?.user_id) {
+      throw new Error("USER_E_00001");
+    }
+
+    const userId = findUser.user_id;
+
+    // =====================================================
+    // GET VIDEO
+    // =====================================================
+
+    const video = await VideoMaster.findOne({
+      where: {
+        videoRefId,
+      },
+    });
+
+    if (!video) {
+      throw new Error("VIDEO_E_00001");
+    }
+
+    // =====================================================
+    // CHECK USER SESSION ACCESS
+    // =====================================================
+
+    const userSession = await UserSessionMapping.findOne({
+      where: {
+        userId,
+        sessionId: video.sessionId,
+        status: 1,
+      },
+    });
+
+    if (!userSession) {
+      throw new Error("SESSION_E_00004");
+    }
+
+    // =====================================================
+    // GET PROGRESS
+    // =====================================================
+
+    const progress = await VideoWatchProgress.findOne({
+      where: {
+        userId,
+        videoId: video.videoId,
+      },
+      order: [["videoWatchProgressId", "desc"]],
+    });
+
+    // =====================================================
+    // NO PROGRESS
+    // =====================================================
+
+    if (!progress) {
+      return {
+        videoRefId: video.videoRefId,
+        videoId: video.videoId,
+        lastWatchedDuration: 0,
+        videoDuration: 0,
+        isCompleted: false,
+      };
+    }
+
+    // =====================================================
+    // RETURN EXISTING PROGRESS
+    // =====================================================
+
+    return {
+      videoRefId: video.videoRefId,
+      videoId: video.videoId,
+      lastWatchedDuration: progress.lastWatchedDuration,
+      videoDuration: progress.videoDuration,
+      isCompleted: progress.isCompleted,
+    };
+  } catch (error) {
+    logger.error("Error getVideoProgress/video.service.ts", error);
+
     throw error;
   }
 };

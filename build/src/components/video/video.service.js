@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteVideo = exports.getVideo = exports.getAllVideos = exports.createVideo = void 0;
+exports.getVideoProgress = exports.createVideoProgress = exports.deleteVideo = exports.getVideo = exports.getAllVideos = exports.createVideo = void 0;
 const dal = __importStar(require("../../db/dal/videos"));
 const jwt_utils_1 = require("../auth/jwt.utils");
 const createVideo = async (params, token) => {
@@ -56,4 +56,14 @@ const deleteVideo = async (params, token) => {
     return deleteVideo;
 };
 exports.deleteVideo = deleteVideo;
+const createVideoProgress = async (params, token) => {
+    const createVideoProgress = await dal.createVideoProgress(params, await (0, jwt_utils_1.verifyJWT)(token)?.payload);
+    return createVideoProgress;
+};
+exports.createVideoProgress = createVideoProgress;
+const getVideoProgress = async (params, token) => {
+    const getVideoProgress = await dal.getVideoProgress(params, await (0, jwt_utils_1.verifyJWT)(token)?.payload);
+    return getVideoProgress;
+};
+exports.getVideoProgress = getVideoProgress;
 //# sourceMappingURL=video.service.js.map

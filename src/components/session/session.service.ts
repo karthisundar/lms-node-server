@@ -18,7 +18,7 @@ export const getAllSessions = async (params: any): Promise<any> => {
 };
 
 export const getSession = async (params: any): Promise<any> => {
-  const getSession = await dal.getSession(params);
+  const getSession = await dal.getSession(params?.sessionRefId);
   return getSession;
 };
 

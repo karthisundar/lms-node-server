@@ -26,3 +26,25 @@ export const deleteVideo = async (params: any, token: string): Promise<any> => {
   );
   return deleteVideo;
 };
+
+export const createVideoProgress = async (
+  params: any,
+  token: string,
+): Promise<any> => {
+  const createVideoProgress = await dal.createVideoProgress(
+    params,
+    await verifyJWT(token)?.payload,
+  );
+  return createVideoProgress;
+};
+
+export const getVideoProgress = async (
+  params: any,
+  token: string,
+): Promise<any> => {
+  const getVideoProgress = await dal.getVideoProgress(
+    params,
+    await verifyJWT(token)?.payload,
+  );
+  return getVideoProgress;
+};
