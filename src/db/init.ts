@@ -9,6 +9,7 @@ import ModuleMaster from "./model/ModuleMaster";
 import RoleMenuAccess from "./model/RoleMenuAccess";
 import SessionMaster from "./model/SessionMaster";
 import User from "./model/User";
+import UserLessonMapping from "./model/UserLessonMapping";
 import UserRoleMapping from "./model/UserMaping";
 import UserRole from "./model/UserRole";
 import UserSessionMapping from "./model/UserSessionMapping";
@@ -35,6 +36,7 @@ const dbInit = () =>
     LessonNoteMaster.sync(),
     LessonVideoMapping.sync(),
     ModuleMaster.sync(),
+    UserLessonMapping.sync()
   ]);
 
 export default dbInit;

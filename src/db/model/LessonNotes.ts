@@ -1,16 +1,22 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelizeConnection from "../config";
 
-export interface lessonNoteAttributes {
-  lessonNoteId: number;
-  lessonNoteRefId: string;
+interface lessonNotesAttributes {
+  lessonNotesId: number;
+  lessonNotesRefId: string;
 
-  lessonId: number;
+  lessonId: string;
 
   title: string;
   content: string;
 
-  sequenceNo: number;
+  // S3 document information
+  documentName: string | null;
+  documentUrl: string | null;
+  documentKey: string | null;
+  documentMimeType: string | null;
+  documentSize: number | null;
+
   status: number;
 
   createdBy: number;
@@ -22,11 +28,15 @@ export interface lessonNoteAttributes {
   deletedAt: Date | null;
 }
 
-export type lessonNoteInput = Optional<
-  lessonNoteAttributes,
-  | "lessonNoteId"
-  | "lessonNoteRefId"
-  | "sequenceNo"
+export type lessonNotesInput = Optional<
+  lessonNotesAttributes,
+  | "lessonNotesId"
+  | "lessonNotesRefId"
+  | "documentName"
+  | "documentUrl"
+  | "documentKey"
+  | "documentMimeType"
+  | "documentSize"
   | "status"
   | "updatedBy"
   | "deletedBy"
@@ -35,21 +45,27 @@ export type lessonNoteInput = Optional<
   | "deletedAt"
 >;
 
-export type lessonNoteOutput = Required<lessonNoteAttributes>;
+export type lessonNotesOutput = Required<lessonNotesAttributes>;
 
-class LessonNoteMaster extends Model<
-  lessonNoteOutput,
-  lessonNoteInput
-> implements lessonNoteAttributes {
-  declare lessonNoteId: number;
-  declare lessonNoteRefId: string;
+class LessonNotes
+  extends Model<lessonNotesOutput, lessonNotesInput>
+  implements lessonNotesAttributes
+{
+  declare lessonNotesId: number;
+  declare lessonNotesRefId: string;
 
-  declare lessonId: number;
+  declare lessonId: string;
 
   declare title: string;
   declare content: string;
 
-  declare sequenceNo: number;
+  // S3 document information
+  declare documentName: string | null;
+  declare documentUrl: string | null;
+  declare documentKey: string | null;
+  declare documentMimeType: string | null;
+  declare documentSize: number | null;
+
   declare status: number;
 
   declare createdBy: number;
@@ -61,15 +77,15 @@ class LessonNoteMaster extends Model<
   declare readonly deletedAt: Date | null;
 }
 
-LessonNoteMaster.init(
+LessonNotes.init(
   {
-    lessonNoteId: {
+    lessonNotesId: {
       type: DataTypes.INTEGER.UNSIGNED,
       primaryKey: true,
       autoIncrement: true,
     },
 
-    lessonNoteRefId: {
+    lessonNotesRefId: {
       type: DataTypes.UUID,
       allowNull: false,
       unique: true,
@@ -77,31 +93,68 @@ LessonNoteMaster.init(
     },
 
     lessonId: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.UUID,
       allowNull: false,
     },
 
     title: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false,
     },
 
     content: {
-      type: DataTypes.TEXT("long"),
+      type: DataTypes.TEXT,
       allowNull: false,
     },
 
-    sequenceNo: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      defaultValue: 1,
+    /**
+     * ========================================================
+     * S3 DOCUMENT FIELDS
+     * ========================================================
+     */
+
+    documentName: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
+
+    documentUrl: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    documentKey: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    documentMimeType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    documentSize: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+    },
+
+    /**
+     * ========================================================
+     * STATUS
+     * ========================================================
+     */
 
     status: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,
     },
+
+    /**
+     * ========================================================
+     * AUDIT FIELDS
+     * ========================================================
+     */
 
     createdBy: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -121,7 +174,6 @@ LessonNoteMaster.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
 
     updatedAt: {
@@ -136,10 +188,13 @@ LessonNoteMaster.init(
   },
   {
     sequelize: sequelizeConnection,
-    tableName: "lesson_note_master",
+
+    tableName: "lesson_notes",
+
     paranoid: true,
-    timestamps: true,
+
+    timestamps: false,
   },
 );
 
-export default LessonNoteMaster;
+export default LessonNotes;

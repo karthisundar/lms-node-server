@@ -5,11 +5,11 @@ export interface lessonVideoMappingAttributes {
   lessonVideoMappingId: number;
   lessonVideoMappingRefId: string;
 
-  lessonId: number;
-  videoId: number;
+  lessonRefId: string;
+  videoRefId: string;
 
-  sequenceNo: number;
-  status: number;
+  displayOrder: number;
+  status: string;
 
   createdBy: number;
   updatedBy: number | null;
@@ -24,7 +24,7 @@ export type lessonVideoMappingInput = Optional<
   lessonVideoMappingAttributes,
   | "lessonVideoMappingId"
   | "lessonVideoMappingRefId"
-  | "sequenceNo"
+  | "displayOrder"
   | "status"
   | "updatedBy"
   | "deletedBy"
@@ -33,21 +33,21 @@ export type lessonVideoMappingInput = Optional<
   | "deletedAt"
 >;
 
-export type lessonVideoMappingOutput =
-  Required<lessonVideoMappingAttributes>;
+export type lessonVideoMappingOutput = Required<lessonVideoMappingAttributes>;
 
-class LessonVideoMapping extends Model<
-  lessonVideoMappingOutput,
-  lessonVideoMappingInput
-> implements lessonVideoMappingAttributes {
+class LessonVideoMapping
+  extends Model<lessonVideoMappingOutput, lessonVideoMappingInput>
+  implements lessonVideoMappingAttributes
+{
   declare lessonVideoMappingId: number;
+
   declare lessonVideoMappingRefId: string;
 
-  declare lessonId: number;
-  declare videoId: number;
+  declare lessonRefId: string;
+  declare videoRefId: string;
 
-  declare sequenceNo: number;
-  declare status: number;
+  declare displayOrder: number;
+  declare status: string;
 
   declare createdBy: number;
   declare updatedBy: number | null;
@@ -73,26 +73,26 @@ LessonVideoMapping.init(
       defaultValue: DataTypes.UUIDV4,
     },
 
-    lessonId: {
-      type: DataTypes.INTEGER.UNSIGNED,
+    lessonRefId: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
 
-    videoId: {
-      type: DataTypes.INTEGER.UNSIGNED,
+    videoRefId: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
 
-    sequenceNo: {
-      type: DataTypes.INTEGER.UNSIGNED,
+    displayOrder: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,
     },
 
     status: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 1,
+      defaultValue: "active",
     },
 
     createdBy: {
@@ -113,7 +113,6 @@ LessonVideoMapping.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
 
     updatedAt: {
@@ -128,8 +127,11 @@ LessonVideoMapping.init(
   },
   {
     sequelize: sequelizeConnection,
+
     tableName: "lesson_video_mapping",
+
     paranoid: true,
+
     timestamps: true,
   },
 );

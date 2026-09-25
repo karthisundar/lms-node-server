@@ -1,16 +1,14 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelizeConnection from "../config";
-import ModuleMaster from "./ModuleMaster";
 
-export interface courseMasterAttributes {
-  courseId: number;
-  courseRefId: string;
+interface userLessonAttributes {
+  userLessonId: number;
+  userLessonRefId: string;
 
-  courseCode: string;
-  courseName: string;
-  description: string | null;
+  userId: number;
+  lessonId: string;
 
-  status: string;
+  status: number;
 
   createdBy: number;
   updatedBy: number | null;
@@ -21,13 +19,11 @@ export interface courseMasterAttributes {
   deletedAt: Date | null;
 }
 
-export type courseMasterInput = Optional<
-  courseMasterAttributes,
-  | "courseId"
-  | "courseRefId"
-  | "description"
+export type userLessonInput = Optional<
+  userLessonAttributes,
+  | "userLessonId"
+  | "userLessonRefId"
   | "status"
-  | "createdBy"
   | "updatedBy"
   | "deletedBy"
   | "createdAt"
@@ -35,20 +31,19 @@ export type courseMasterInput = Optional<
   | "deletedAt"
 >;
 
-export type courseMasterOutput = Required<courseMasterAttributes>;
+export type userLessonOutput = Required<userLessonAttributes>;
 
-class CourseMaster
-  extends Model<courseMasterOutput, courseMasterInput>
-  implements courseMasterAttributes
+class UserLessonMapping
+  extends Model<userLessonOutput, userLessonInput>
+  implements userLessonAttributes
 {
-  declare courseId: number;
-  declare courseRefId: string;
+  declare userLessonId: number;
+  declare userLessonRefId: string;
 
-  declare courseCode: string;
-  declare courseName: string;
-  declare description: string | null;
+  declare userId: number;
+  declare lessonId: string;
 
-  declare status: string;
+  declare status: number;
 
   declare createdBy: number;
   declare updatedBy: number | null;
@@ -59,41 +54,35 @@ class CourseMaster
   declare readonly deletedAt: Date | null;
 }
 
-CourseMaster.init(
+UserLessonMapping.init(
   {
-    courseId: {
+    userLessonId: {
       type: DataTypes.INTEGER.UNSIGNED,
       primaryKey: true,
       autoIncrement: true,
     },
 
-    courseRefId: {
+    userLessonRefId: {
       type: DataTypes.UUID,
       allowNull: false,
       unique: true,
       defaultValue: DataTypes.UUIDV4,
     },
 
-    courseCode: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-      unique: true,
-    },
-
-    courseName: {
-      type: DataTypes.STRING(255),
+    userId: {
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
 
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+    lessonId: {
+      type: DataTypes.UUID,
+      allowNull: false,
     },
 
     status: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: "draft",
+      defaultValue: 1,
     },
 
     createdBy: {
@@ -114,7 +103,6 @@ CourseMaster.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
 
     updatedAt: {
@@ -129,17 +117,9 @@ CourseMaster.init(
   },
   {
     sequelize: sequelizeConnection,
-    tableName: "course_master",
+    tableName: "user_lesson_mapping",
     paranoid: true,
-    timestamps: true,
   },
 );
 
-ModuleMaster.hasMany(CourseMaster, {
-  foreignKey: "courseId",
-  sourceKey: "courseId",
-  as: "course",
-});
-CourseMaster.hasMany(ModuleMaster, { foreignKey: "courseId" });
-
-export default CourseMaster;
+export default UserLessonMapping;
