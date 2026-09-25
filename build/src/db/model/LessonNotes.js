@@ -5,42 +5,72 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const config_1 = __importDefault(require("../config"));
-class LessonNoteMaster extends sequelize_1.Model {
+class LessonNotes extends sequelize_1.Model {
 }
-LessonNoteMaster.init({
-    lessonNoteId: {
+LessonNotes.init({
+    lessonNotesId: {
         type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
         primaryKey: true,
         autoIncrement: true,
     },
-    lessonNoteRefId: {
+    lessonNotesRefId: {
         type: sequelize_1.DataTypes.UUID,
         allowNull: false,
         unique: true,
         defaultValue: sequelize_1.DataTypes.UUIDV4,
     },
     lessonId: {
-        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        type: sequelize_1.DataTypes.UUID,
         allowNull: false,
     },
     title: {
-        type: sequelize_1.DataTypes.STRING(255),
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
     content: {
-        type: sequelize_1.DataTypes.TEXT("long"),
+        type: sequelize_1.DataTypes.TEXT,
         allowNull: false,
     },
-    sequenceNo: {
-        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
-        allowNull: false,
-        defaultValue: 1,
+    /**
+     * ========================================================
+     * S3 DOCUMENT FIELDS
+     * ========================================================
+     */
+    documentName: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
     },
+    documentUrl: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: true,
+    },
+    documentKey: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
+    },
+    documentMimeType: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
+    },
+    documentSize: {
+        type: sequelize_1.DataTypes.BIGINT,
+        allowNull: true,
+    },
+    /**
+     * ========================================================
+     * STATUS
+     * ========================================================
+     */
     status: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1,
     },
+    /**
+     * ========================================================
+     * AUDIT FIELDS
+     * ========================================================
+     */
     createdBy: {
         type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
@@ -56,7 +86,6 @@ LessonNoteMaster.init({
     createdAt: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: false,
-        defaultValue: sequelize_1.DataTypes.NOW,
     },
     updatedAt: {
         type: sequelize_1.DataTypes.DATE,
@@ -68,9 +97,9 @@ LessonNoteMaster.init({
     },
 }, {
     sequelize: config_1.default,
-    tableName: "lesson_note_master",
+    tableName: "lesson_notes",
     paranoid: true,
-    timestamps: true,
+    timestamps: false,
 });
-exports.default = LessonNoteMaster;
+exports.default = LessonNotes;
 //# sourceMappingURL=LessonNotes.js.map

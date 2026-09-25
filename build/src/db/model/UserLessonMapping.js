@@ -5,54 +5,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const config_1 = __importDefault(require("../config"));
-class LessonMaster extends sequelize_1.Model {
+class UserLessonMapping extends sequelize_1.Model {
 }
-LessonMaster.init({
-    lessonId: {
+UserLessonMapping.init({
+    userLessonId: {
         type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
         primaryKey: true,
         autoIncrement: true,
     },
-    lessonRefId: {
+    userLessonRefId: {
         type: sequelize_1.DataTypes.UUID,
         allowNull: false,
         unique: true,
         defaultValue: sequelize_1.DataTypes.UUIDV4,
     },
-    moduleRefId: {
+    userId: {
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+    },
+    lessonId: {
         type: sequelize_1.DataTypes.UUID,
         allowNull: false,
     },
-    lessonCode: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-    },
-    lessonName: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    description: {
-        type: sequelize_1.DataTypes.TEXT,
-        allowNull: true,
-    },
-    videoRefId: {
-        type: sequelize_1.DataTypes.UUID,
-        allowNull: true,
-    },
-    notes: {
-        type: sequelize_1.DataTypes.TEXT,
-        allowNull: true,
-    },
-    displayOrder: {
+    status: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1,
-    },
-    status: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-        defaultValue: "draft",
     },
     createdBy: {
         type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
@@ -80,9 +58,8 @@ LessonMaster.init({
     },
 }, {
     sequelize: config_1.default,
-    tableName: "lesson_master",
+    tableName: "user_lesson_mapping",
     paranoid: true,
-    timestamps: true,
 });
-exports.default = LessonMaster;
-//# sourceMappingURL=LessonMaster.js.map
+exports.default = UserLessonMapping;
+//# sourceMappingURL=UserLessonMapping.js.map

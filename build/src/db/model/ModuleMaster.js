@@ -24,24 +24,25 @@ ModuleMaster.init({
         allowNull: false,
     },
     moduleCode: {
-        type: sequelize_1.DataTypes.STRING(100),
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
+        unique: true,
     },
     moduleName: {
-        type: sequelize_1.DataTypes.STRING(255),
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
     description: {
         type: sequelize_1.DataTypes.TEXT,
         allowNull: true,
     },
-    sequenceNo: {
-        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+    displayOrder: {
+        type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1,
     },
     status: {
-        type: sequelize_1.DataTypes.STRING(30),
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         defaultValue: "draft",
     },
@@ -60,7 +61,6 @@ ModuleMaster.init({
     createdAt: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: false,
-        defaultValue: sequelize_1.DataTypes.NOW,
     },
     updatedAt: {
         type: sequelize_1.DataTypes.DATE,

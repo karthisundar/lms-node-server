@@ -19,23 +19,23 @@ LessonVideoMapping.init({
         unique: true,
         defaultValue: sequelize_1.DataTypes.UUIDV4,
     },
-    lessonId: {
-        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+    lessonRefId: {
+        type: sequelize_1.DataTypes.UUID,
         allowNull: false,
     },
-    videoId: {
-        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+    videoRefId: {
+        type: sequelize_1.DataTypes.UUID,
         allowNull: false,
     },
-    sequenceNo: {
-        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+    displayOrder: {
+        type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1,
     },
     status: {
-        type: sequelize_1.DataTypes.INTEGER,
+        type: sequelize_1.DataTypes.STRING,
         allowNull: false,
-        defaultValue: 1,
+        defaultValue: "active",
     },
     createdBy: {
         type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
@@ -52,7 +52,6 @@ LessonVideoMapping.init({
     createdAt: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: false,
-        defaultValue: sequelize_1.DataTypes.NOW,
     },
     updatedAt: {
         type: sequelize_1.DataTypes.DATE,

@@ -14,6 +14,7 @@ const ModuleMaster_1 = __importDefault(require("./model/ModuleMaster"));
 const RoleMenuAccess_1 = __importDefault(require("./model/RoleMenuAccess"));
 const SessionMaster_1 = __importDefault(require("./model/SessionMaster"));
 const User_1 = __importDefault(require("./model/User"));
+const UserLessonMapping_1 = __importDefault(require("./model/UserLessonMapping"));
 const UserMaping_1 = __importDefault(require("./model/UserMaping"));
 const UserRole_1 = __importDefault(require("./model/UserRole"));
 const UserSessionMapping_1 = __importDefault(require("./model/UserSessionMapping"));
@@ -38,6 +39,7 @@ const dbInit = () => Promise.all([
     LessonNotes_1.default.sync(),
     LessonVideoMapping_1.default.sync(),
     ModuleMaster_1.default.sync(),
+    UserLessonMapping_1.default.sync()
 ]);
 exports.default = dbInit;
 //# sourceMappingURL=init.js.map
