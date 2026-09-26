@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.getAllUserMenu = exports.createUser = exports.checkCreateUser = exports.getAllUser = exports.getActionUser = exports.setPassword = exports.checkUserToken = exports.logout = exports.login = void 0;
+exports.getUserDetails = exports.deleteUser = exports.getAllUserMenu = exports.createUser = exports.checkCreateUser = exports.getAllUser = exports.getActionUser = exports.setPassword = exports.checkUserToken = exports.logout = exports.login = void 0;
 const User_1 = __importDefault(require("../model/User"));
 const jwt = __importStar(require("../../components/auth/jwt.utils"));
 const bcrypt = __importStar(require("bcrypt"));
@@ -432,4 +432,71 @@ const deleteUser = async (queryData, payload) => {
     }
 };
 exports.deleteUser = deleteUser;
+const getUserDetails = async (userRefId, payload) => {
+    try {
+        const newRefId = userRefId ? userRefId : payload?.user_ref_id;
+        const user = await User_1.default.findOne({
+            where: {
+                user_ref_id: newRefId,
+            },
+            attributes: [
+                "user_id",
+                "user_ref_id",
+                "name",
+                "email",
+                "phone_number",
+                "is_active",
+                "createdAt",
+                "updatedAt",
+            ],
+            raw: true,
+        });
+        if (!user) {
+            throw new Error("USER_E_00001");
+        }
+        const roleMappings = await UserMaping_1.default.findAll({
+            where: {
+                user_id: user.user_id,
+                status: 1,
+            },
+            attributes: ["userRoleMappingId", "role_id", "user_id", "status"],
+            raw: true,
+        });
+        const roleIds = roleMappings.map((item) => item.role_id);
+        let roles = [];
+        if (roleIds.length > 0) {
+            roles = await UserRole_1.default.findAll({
+                where: {
+                    role_id: roleIds,
+                },
+                raw: true,
+            });
+        }
+        const userRoles = roleMappings.map((mapping) => {
+            const role = roles.find((item) => Number(item.role_id) === Number(mapping.role_id));
+            return {
+                userRoleMappingId: mapping.userRoleMappingId,
+                roleId: mapping.role_id,
+                roleName: role?.role_name ?? role?.roleName ?? null,
+                status: mapping.status,
+            };
+        });
+        return {
+            user_id: user.user_id,
+            user_ref_id: user.user_ref_id,
+            name: user.name,
+            email: user.email,
+            phone_number: user.phone_number,
+            is_active: user.is_active,
+            roles: userRoles,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        };
+    }
+    catch (error) {
+        logger_1.default.error("Error getUserDetails/user.ts", error);
+        throw error;
+    }
+};
+exports.getUserDetails = getUserDetails;
 //# sourceMappingURL=user.js.map

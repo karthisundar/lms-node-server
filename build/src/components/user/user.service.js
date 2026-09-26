@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.getAllUser = exports.checkCreateUser = exports.createUser = exports.setPassword = exports.logout = exports.login = exports.passwordChangetoEncrypt = void 0;
+exports.getUserDetails = exports.deleteUser = exports.getAllUser = exports.checkCreateUser = exports.createUser = exports.setPassword = exports.logout = exports.login = exports.passwordChangetoEncrypt = void 0;
 const dal = __importStar(require("../../db/dal/user"));
 const bcrypt = __importStar(require("bcrypt"));
 const jwt_utils_1 = require("../auth/jwt.utils");
@@ -83,4 +83,9 @@ const deleteUser = async (params, token) => {
     return deleteUser;
 };
 exports.deleteUser = deleteUser;
+const getUserDetails = async (params, token) => {
+    const getUserDetails = await dal.getUserDetails(params, await (0, jwt_utils_1.verifyJWT)(token)?.payload);
+    return getUserDetails;
+};
+exports.getUserDetails = getUserDetails;
 //# sourceMappingURL=user.service.js.map

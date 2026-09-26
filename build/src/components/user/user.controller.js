@@ -59,6 +59,7 @@ class UserController extends BaseApi_1.default {
         this.router.post("/setPassword", authorization_1.checkAccess, this.setPassword.bind(this));
         this.router.post("/createUser", authorization_1.checkAccess, (0, validator_1.validator)((0, express_validator_1.checkSchema)(user_validator_1.checkCreateUser)), this.createUser.bind(this));
         this.router.get("/getAllUsers", authorization_1.checkAccess, this.getAllUser.bind(this));
+        this.router.get("/getUserDetails", this.getUserDetails.bind(this));
         this.router.get("/clientLabel", this.clientLabelJson.bind(this));
         this.router.post("/deleteUser", this.deleteUser.bind(this));
         return this.router;
@@ -169,6 +170,16 @@ class UserController extends BaseApi_1.default {
     async clientLabelJson(req, res, next) {
         try {
             res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", serverlabel_config_json_1.default);
+            super.send(res);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async getUserDetails(req, res, next) {
+        try {
+            const getUserDetails = await service.getUserDetails(req.query, req?.headers.authorization);
+            res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", getUserDetails);
             super.send(res);
         }
         catch (error) {
