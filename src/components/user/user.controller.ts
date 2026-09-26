@@ -29,6 +29,7 @@ export default class UserController extends BaseApi {
       this.createUser.bind(this),
     );
     this.router.get("/getAllUsers", checkAccess, this.getAllUser.bind(this));
+    this.router.get("/getUserDetails", this.getUserDetails.bind(this));
     this.router.get("/clientLabel", this.clientLabelJson.bind(this));
     this.router.post("/deleteUser", this.deleteUser.bind(this));
 
@@ -190,6 +191,23 @@ export default class UserController extends BaseApi {
   ): Promise<void> {
     try {
       res.locals.data = returnSuccess(StatusCodes.OK, "", serverLabel);
+      super.send(res);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async getUserDetails(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const getUserDetails = await service.getUserDetails(
+        req.query,
+        req?.headers.authorization,
+      );
+      res.locals.data = returnSuccess(StatusCodes.OK, "", getUserDetails);
       super.send(res);
     } catch (error) {
       next(error);

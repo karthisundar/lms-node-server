@@ -449,3 +449,87 @@ export const deleteUser = async (
     throw new Error(error);
   }
 };
+
+export const getUserDetails = async (
+  userRefId: string,
+  payload?: any,
+): Promise<any> => {
+  try {
+    const newRefId = userRefId ? userRefId : payload?.user_ref_id;
+
+    const user = await User.findOne({
+      where: {
+        user_ref_id: newRefId,
+      },
+      attributes: [
+        "user_id",
+        "user_ref_id",
+        "name",
+        "email",
+        "phone_number",
+        "is_active",
+        "createdAt",
+        "updatedAt",
+      ],
+      raw: true,
+    });
+
+    if (!user) {
+      throw new Error("USER_E_00001");
+    }
+
+    const roleMappings = await UserRoleMapping.findAll({
+      where: {
+        user_id: user.user_id,
+        status: 1,
+      },
+      attributes: ["userRoleMappingId", "role_id", "user_id", "status"],
+      raw: true,
+    });
+
+    const roleIds = roleMappings.map((item: any) => item.role_id);
+
+    let roles: any[] = [];
+
+    if (roleIds.length > 0) {
+      roles = await UserRole.findAll({
+        where: {
+          role_id: roleIds,
+        },
+        raw: true,
+      });
+    }
+
+    const userRoles = roleMappings.map((mapping: any) => {
+      const role = roles.find(
+        (item: any) => Number(item.role_id) === Number(mapping.role_id),
+      );
+
+      return {
+        userRoleMappingId: mapping.userRoleMappingId,
+
+        roleId: mapping.role_id,
+
+        roleName: role?.role_name ?? role?.roleName ?? null,
+
+        status: mapping.status,
+      };
+    });
+
+    return {
+      user_id: user.user_id,
+      user_ref_id: user.user_ref_id,
+      name: user.name,
+      email: user.email,
+      phone_number: user.phone_number,
+      is_active: user.is_active,
+      roles: userRoles,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  } catch (error) {
+    logger.error("Error getUserDetails/user.ts", error);
+
+    throw error;
+  }
+};

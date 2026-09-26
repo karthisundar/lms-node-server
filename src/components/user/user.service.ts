@@ -65,3 +65,14 @@ export const deleteUser = async (params: any, token: string): Promise<any> => {
   );
   return deleteUser;
 };
+
+export const getUserDetails = async (
+  params: any,
+  token?: string,
+): Promise<any> => {
+  const getUserDetails = await dal.getUserDetails(
+    params,
+    await verifyJWT(token)?.payload,
+  );
+  return getUserDetails;
+};
