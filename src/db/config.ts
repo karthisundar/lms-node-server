@@ -22,7 +22,7 @@ const sequelizeConnection = new Sequelize(
     pool: {
       acquire: 500000,
     },
-    // logging: false
+    logging: false
   },
 );
 

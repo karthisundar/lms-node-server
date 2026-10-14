@@ -1,5 +1,6 @@
 import { DataTypes, Model, ModelStatic, Optional, Sequelize } from "sequelize";
 import sequelizeConnection from "../config";
+import MenuMaster from "./MenuMaster";
 
 interface menuItemsAttributes {
   menuItemsId: number;
@@ -68,5 +69,23 @@ MenuItems.init(
     tableName: "menu_items",
   },
 );
+
+// MenuItems.belongsTo(MenuMaster, {
+//   foreignKey: "menuMasterId",
+//   targetKey: "menuMasterId",
+//   as: "menuMaster",
+// });
+// MenuMaster.hasMany(MenuItems, {
+//   foreignKey: "menuMasterId",
+//   sourceKey: "menuMasterId",
+//   as: "menuItems",
+// });
+
+MenuItems.hasMany(MenuMaster, {
+  foreignKey: "menuMasterId",
+  sourceKey: "menuMasterId",
+  as: "menuMaster",
+});
+MenuMaster.hasMany(MenuItems, { foreignKey: "menuMasterId" });
 
 export default MenuItems;

@@ -62,6 +62,7 @@ class UserController extends BaseApi_1.default {
         this.router.get("/getUserDetails", this.getUserDetails.bind(this));
         this.router.get("/clientLabel", this.clientLabelJson.bind(this));
         this.router.post("/deleteUser", this.deleteUser.bind(this));
+        this.router.get("/getUserMenu", this.getUserMenusNew.bind(this));
         return this.router;
     }
     async login(req, res, next) {
@@ -190,6 +191,16 @@ class UserController extends BaseApi_1.default {
         try {
             const deleteUser = await service.deleteUser(req.body, req.headers.authorization);
             res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", deleteUser);
+            super.send(res);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async getUserMenusNew(req, res, next) {
+        try {
+            const getUserMenusNew = await service.getUserMenusNew(req.headers.authorization);
+            res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", getUserMenusNew);
             super.send(res);
         }
         catch (error) {

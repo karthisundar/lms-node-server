@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserDetails = exports.deleteUser = exports.getAllUserMenu = exports.createUser = exports.checkCreateUser = exports.getAllUser = exports.getActionUser = exports.setPassword = exports.checkUserToken = exports.logout = exports.login = void 0;
+exports.getUserMenusNew = exports.getUserMenus = exports.getUserDetails = exports.deleteUser = exports.getAllUserMenu = exports.createUser = exports.checkCreateUser = exports.getAllUser = exports.getActionUser = exports.setPassword = exports.checkUserToken = exports.logout = exports.login = void 0;
 const User_1 = __importDefault(require("../model/User"));
 const jwt = __importStar(require("../../components/auth/jwt.utils"));
 const bcrypt = __importStar(require("bcrypt"));
@@ -499,4 +499,267 @@ const getUserDetails = async (userRefId, payload) => {
     }
 };
 exports.getUserDetails = getUserDetails;
+const getUserMenus = async (payload) => {
+    try {
+        /**
+         * Logged-in user
+         */
+        const findUser = await (0, exports.getActionUser)(payload?.user_ref_id);
+        if (!findUser?.user_id) {
+            throw new Error("USER_E_00001");
+        }
+        /**
+         * Find active roles assigned to user
+         */
+        const userRoles = await UserMaping_1.default.findAll({
+            where: {
+                user_id: findUser.user_id,
+                status: 1,
+            },
+            attributes: ["role_id"],
+        });
+        if (!userRoles?.length) {
+            return [];
+        }
+        /**
+         * Extract role IDs
+         */
+        const roleIds = [
+            ...new Set(userRoles
+                .map((item) => Number(item.role_id))
+                .filter((roleId) => !Number.isNaN(roleId))),
+        ];
+        if (!roleIds.length) {
+            return [];
+        }
+        /**
+         * Find menu access for user's roles
+         */
+        const roleMenuAccess = await RoleMenuAccess_1.default.findAll({
+            where: {
+                roleId: {
+                    [sequelize_1.Op.in]: roleIds,
+                },
+            },
+            attributes: ["menuItemsId"],
+        });
+        if (!roleMenuAccess?.length) {
+            return [];
+        }
+        /**
+         * Remove duplicate menu item IDs
+         *
+         * This is important when the user
+         * has multiple roles having access
+         * to the same menu.
+         */
+        const menuItemIds = [
+            ...new Set(roleMenuAccess
+                .map((item) => Number(item.menuItemsId))
+                .filter((menuItemId) => !Number.isNaN(menuItemId))),
+        ];
+        if (!menuItemIds.length) {
+            return [];
+        }
+        /**
+         * Find active menu items
+         *
+         * Include only active parent menus.
+         */
+        const menuItems = await MenuItems_1.default.findAll({
+            where: {
+                menuItemsId: {
+                    [sequelize_1.Op.in]: menuItemIds,
+                },
+                isActive: true,
+            },
+            attributes: [
+                "menuItemsId",
+                "menuMasterId",
+                "menuPath",
+                "logoPath",
+                "isActive",
+            ],
+            include: [
+                {
+                    model: MenuMaster_1.default,
+                    as: "menuMaster",
+                    required: true,
+                    where: {
+                        isActive: true,
+                    },
+                    attributes: [
+                        "menuMasterId",
+                        "menuName",
+                        "menuPath",
+                        "logoPath",
+                        "isActive",
+                    ],
+                },
+            ],
+            order: [
+                ["menuMasterId", "ASC"],
+                ["menuItemsId", "ASC"],
+            ],
+        });
+        if (!menuItems?.length) {
+            return [];
+        }
+        /**
+         * Group menu items by menu master
+         */
+        const menuMap = new Map();
+        for (const menuItem of menuItems) {
+            const itemData = menuItem.toJSON();
+            const menuMaster = itemData.menuMaster;
+            if (!menuMaster) {
+                continue;
+            }
+            const menuMasterId = Number(menuMaster.menuMasterId);
+            if (!menuMap.has(menuMasterId)) {
+                menuMap.set(menuMasterId, {
+                    menuMasterId: menuMaster.menuMasterId,
+                    menuName: menuMaster.menuName,
+                    menuPath: menuMaster.menuPath,
+                    logoPath: menuMaster.logoPath,
+                    items: [],
+                });
+            }
+            menuMap.get(menuMasterId).items.push({
+                menuItemsId: itemData.menuItemsId,
+                menuPath: itemData.menuPath,
+                logoPath: itemData.logoPath,
+                isActive: itemData.isActive,
+            });
+        }
+        return Array.from(menuMap.values());
+    }
+    catch (error) {
+        logger_1.default.error("Error getUserMenus/menu.ts", error);
+        throw error;
+    }
+};
+exports.getUserMenus = getUserMenus;
+const getUserMenusNew = async (payload) => {
+    try {
+        // 1. Find user
+        const findUser = await (0, exports.getActionUser)(payload?.user_ref_id);
+        if (!findUser?.user_id) {
+            throw new Error("USER_E_00001");
+        }
+        console.log("USER ID:", findUser.user_id);
+        // 2. Get active role mappings
+        const userRoleMappings = await UserMaping_1.default.findAll({
+            where: {
+                user_id: findUser.user_id,
+                status: 1,
+            },
+            attributes: ["role_id"],
+            raw: true,
+        });
+        console.log("USER ROLE MAPPINGS:", userRoleMappings);
+        const roleIds = [
+            ...new Set(userRoleMappings
+                .map((item) => Number(item.role_id))
+                .filter((id) => Number.isInteger(id) && id > 0)),
+        ];
+        console.log("ROLE IDS:", roleIds);
+        if (!roleIds.length) {
+            return [];
+        }
+        // 3. Get menu access assigned to these roles
+        const roleMenuAccess = await RoleMenuAccess_1.default.findAll({
+            where: {
+                roleId: {
+                    [sequelize_1.Op.in]: roleIds,
+                },
+            },
+            attributes: ["roleMenuAccessId", "roleId", "menuItemsId"],
+            raw: true,
+        });
+        console.log("ROLE MENU ACCESS:", roleMenuAccess);
+        if (!roleMenuAccess.length) {
+            return [];
+        }
+        // 4. Get unique menu item IDs
+        const menuItemIds = [
+            ...new Set(roleMenuAccess
+                .map((item) => Number(item.menuItemsId))
+                .filter((id) => Number.isInteger(id) && id > 0)),
+        ];
+        console.log("MENU ITEM IDS:", menuItemIds);
+        if (!menuItemIds.length) {
+            return [];
+        }
+        // 5. Get active menu items and their active parent menus
+        const menuItems = await MenuItems_1.default.findAll({
+            where: {
+                menuItemsId: {
+                    [sequelize_1.Op.in]: menuItemIds,
+                },
+                isActive: true,
+            },
+            attributes: [
+                "menuItemsId",
+                "menuMasterId",
+                "menuPath",
+                "logoPath",
+                "isActive",
+            ],
+            include: [
+                {
+                    model: MenuMaster_1.default,
+                    as: "menuMaster",
+                    required: true,
+                    where: {
+                        isActive: true,
+                    },
+                    attributes: [
+                        "menuMasterId",
+                        "menuName",
+                        "menuPath",
+                        "logoPath",
+                        "isActive",
+                    ],
+                },
+            ],
+            order: [
+                ["menuMasterId", "ASC"],
+                ["menuItemsId", "ASC"],
+            ],
+        });
+        console.log("MATCHED MENU ITEMS:", menuItems.map((item) => item.toJSON()));
+        // 6. Group items by parent menu
+        const menuMap = new Map();
+        for (const menuItem of menuItems) {
+            const item = menuItem.toJSON();
+            const master = item.menuMaster;
+            if (!master) {
+                continue;
+            }
+            const masterId = Number(master.menuMasterId);
+            if (!menuMap.has(masterId)) {
+                menuMap.set(masterId, {
+                    menuMasterId: master.menuMasterId,
+                    menuName: master.menuName,
+                    menuPath: master.menuPath,
+                    logoPath: master.logoPath,
+                    items: [],
+                });
+            }
+            menuMap.get(masterId).items.push({
+                menuItemsId: item.menuItemsId,
+                menuPath: item.menuPath,
+                logoPath: item.logoPath,
+                isActive: item.isActive,
+            });
+        }
+        return Array.from(menuMap.values());
+    }
+    catch (error) {
+        logger_1.default.error("Error getUserMenusNew/menu.ts", error);
+        throw error;
+    }
+};
+exports.getUserMenusNew = getUserMenusNew;
 //# sourceMappingURL=user.js.map

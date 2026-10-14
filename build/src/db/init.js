@@ -21,6 +21,9 @@ const UserSessionMapping_1 = __importDefault(require("./model/UserSessionMapping
 const UserToken_1 = __importDefault(require("./model/UserToken"));
 const VideoMaster_1 = __importDefault(require("./model/VideoMaster"));
 const VideoWatchProgress_1 = __importDefault(require("./model/VideoWatchProgress"));
+const LecturerCourseMapping_1 = __importDefault(require("./model/LecturerCourseMapping"));
+const QuestionMaster_1 = __importDefault(require("./model/QuestionMaster"));
+const QuestionAnswer_1 = __importDefault(require("./model/QuestionAnswer"));
 const dbInit = () => Promise.all([
     User_1.default.sync(),
     UserToken_1.default.sync(),
@@ -39,7 +42,10 @@ const dbInit = () => Promise.all([
     LessonNotes_1.default.sync(),
     LessonVideoMapping_1.default.sync(),
     ModuleMaster_1.default.sync(),
-    UserLessonMapping_1.default.sync()
+    UserLessonMapping_1.default.sync(),
+    LecturerCourseMapping_1.default.sync(),
+    QuestionMaster_1.default.sync(),
+    QuestionAnswer_1.default.sync(),
 ]);
 exports.default = dbInit;
 //# sourceMappingURL=init.js.map

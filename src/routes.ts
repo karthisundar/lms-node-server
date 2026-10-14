@@ -6,6 +6,7 @@ import { VideoController } from "./components/video/video.controller";
 import { CourseController } from "./components/course/course.controller";
 import { ModuleController } from "./components/module/module.controller";
 import { LessionController } from "./components/lesson/lesson.controller";
+import QuestionController from "./components/question/question.controller";
 
 export default function registerRoutes(): Router {
   const router = Router();
@@ -30,6 +31,9 @@ export default function registerRoutes(): Router {
 
   const lessonController = new LessionController();
   router.use("/api/lesson", lessonController.register());
+
+  const questionController = new QuestionController();
+  router.use("/api/question", questionController.register());
 
   return router;
 }

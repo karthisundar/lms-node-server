@@ -76,3 +76,10 @@ export const getUserDetails = async (
   );
   return getUserDetails;
 };
+
+export const getUserMenusNew = async (token: string): Promise<any> => {
+  const getUserMenusNew = await dal.getUserMenusNew(
+    await verifyJWT(token)?.payload,
+  );
+  return getUserMenusNew;
+};

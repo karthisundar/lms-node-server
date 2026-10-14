@@ -32,6 +32,7 @@ export default class UserController extends BaseApi {
     this.router.get("/getUserDetails", this.getUserDetails.bind(this));
     this.router.get("/clientLabel", this.clientLabelJson.bind(this));
     this.router.post("/deleteUser", this.deleteUser.bind(this));
+    this.router.get("/getUserMenu", this.getUserMenusNew.bind(this));
 
     return this.router;
   }
@@ -225,6 +226,22 @@ export default class UserController extends BaseApi {
         req.headers.authorization,
       );
       res.locals.data = returnSuccess(StatusCodes.OK, "", deleteUser);
+      super.send(res);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public async getUserMenusNew(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const getUserMenusNew = await service.getUserMenusNew(
+        req.headers.authorization,
+      );
+      res.locals.data = returnSuccess(StatusCodes.OK, "", getUserMenusNew);
       super.send(res);
     } catch (error) {
       next(error);

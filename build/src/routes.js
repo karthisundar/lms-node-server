@@ -12,6 +12,7 @@ const video_controller_1 = require("./components/video/video.controller");
 const course_controller_1 = require("./components/course/course.controller");
 const module_controller_1 = require("./components/module/module.controller");
 const lesson_controller_1 = require("./components/lesson/lesson.controller");
+const question_controller_1 = __importDefault(require("./components/question/question.controller"));
 function registerRoutes() {
     const router = (0, express_1.Router)();
     const userController = new user_controller_1.default();
@@ -28,6 +29,8 @@ function registerRoutes() {
     router.use("/api/module", moduleController.register());
     const lessonController = new lesson_controller_1.LessionController();
     router.use("/api/lesson", lessonController.register());
+    const questionController = new question_controller_1.default();
+    router.use("/api/question", questionController.register());
     return router;
 }
 //# sourceMappingURL=routes.js.map

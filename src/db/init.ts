@@ -16,6 +16,9 @@ import UserSessionMapping from "./model/UserSessionMapping";
 import User_token from "./model/UserToken";
 import VideoMaster from "./model/VideoMaster";
 import VideoWatchProgress from "./model/VideoWatchProgress";
+import LecturerCourseMapping from "./model/LecturerCourseMapping";
+import QuestionMaster from "./model/QuestionMaster";
+import QuestionAnswer from "./model/QuestionAnswer";
 
 const dbInit = () =>
   Promise.all([
@@ -36,7 +39,10 @@ const dbInit = () =>
     LessonNoteMaster.sync(),
     LessonVideoMapping.sync(),
     ModuleMaster.sync(),
-    UserLessonMapping.sync()
+    UserLessonMapping.sync(),
+    LecturerCourseMapping.sync(),
+    QuestionMaster.sync(),
+    QuestionAnswer.sync(),
   ]);
 
 export default dbInit;
