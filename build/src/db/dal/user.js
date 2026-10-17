@@ -100,6 +100,7 @@ const login = async (userData) => {
         throw new Error(clientlabel_config_json_1.default.user.userError.userNotFound.code);
     }
     const findOldPasswordMatch = bcrypt.compareSync(decodedString, findDataValues?.password);
+    console.log(findUser?.length, "findUser?.length", decodedString, "findOldPasswordMatch", findOldPasswordMatch);
     if (!findOldPasswordMatch)
         throw new Error(clientlabel_config_json_1.default.user.userError.loginError.code);
     const transaction = await config_1.default.transaction();
@@ -250,7 +251,7 @@ const getAllUser = async (queryData) => {
                         attributes: [],
                         association: "userRole",
                         where: {
-                            role_id: 2,
+                            role_id: [2, 3],
                         },
                     },
                 ],
@@ -327,6 +328,18 @@ const createUser = async (queryData, payload) => {
         const user_ref_id = queryData?.user_ref_id;
         // console.log(user_ref_id, "user_ref_iduser_ref_id", payload);
         const is_active = queryData?.is_active ?? queryData?.active;
+        let role_id = 2;
+        const role = queryData?.role;
+        if (role) {
+            const findRole = await UserRole_1.default.findOne({
+                where: {
+                    role_name: role,
+                },
+                nest: true,
+                raw: true,
+            });
+            role_id = findRole?.role_id;
+        }
         const findUser = await (0, exports.getActionUser)(payload?.user_ref_id);
         // ---- UPDATE FLOW: user_ref_id present ----
         if (user_ref_id) {
@@ -339,7 +352,7 @@ const createUser = async (queryData, payload) => {
             // password comes base64 (btoa) encoded, decode then encrypt
             if (password) {
                 const decodedPassword = Buffer.from(password, "base64").toString("utf-8");
-                updateObj.password = await userService.passwordChangetoEncrypt(decodedPassword, 1);
+                updateObj.password = await userService.passwordChangetoEncrypt(password, 1);
             }
             // active/inactive flag, only update if explicitly present
             if (is_active !== undefined && is_active !== null) {
@@ -359,7 +372,7 @@ const createUser = async (queryData, payload) => {
         const decodedPassword = password
             ? Buffer.from(password, "base64").toString("utf-8")
             : password;
-        const decodePassword = await userService.passwordChangetoEncrypt(decodedPassword, 1);
+        const decodePassword = await userService.passwordChangetoEncrypt(password, 1);
         const isActiveDefault = true;
         let obj = {
             name,
@@ -376,7 +389,7 @@ const createUser = async (queryData, payload) => {
             console.log(createUser?.dataValues, "createUser");
             const user_id = createUser?.dataValues?.user_id;
             obj.user_id = user_id;
-            obj.role_id = 2;
+            obj.role_id = role_id;
             await UserMaping_1.default.create(obj, { transaction });
         });
         return true;

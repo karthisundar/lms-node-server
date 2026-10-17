@@ -68,6 +68,13 @@ export const login = async (userData: any): Promise<any> => {
     decodedString,
     findDataValues?.password,
   );
+  console.log(
+    findUser?.length,
+    "findUser?.length",
+    decodedString,
+    "findOldPasswordMatch",
+    findOldPasswordMatch,
+  );
 
   if (!findOldPasswordMatch)
     throw new Error(clientLabel.user.userError.loginError.code);
@@ -234,7 +241,7 @@ export const getAllUser = async (queryData: any): Promise<any> => {
             attributes: [],
             association: "userRole",
             where: {
-              role_id: 2,
+              role_id: [2, 3],
             },
           },
         ],
@@ -323,6 +330,18 @@ export const createUser = async (
     const user_ref_id = queryData?.user_ref_id;
     // console.log(user_ref_id, "user_ref_iduser_ref_id", payload);
     const is_active = queryData?.is_active ?? queryData?.active;
+    let role_id: number = 2;
+    const role = queryData?.role;
+    if (role) {
+      const findRole = await UserRole.findOne({
+        where: {
+          role_name: role,
+        },
+        nest: true,
+        raw: true,
+      });
+      role_id = findRole?.role_id;
+    }
 
     const findUser = await getActionUser(payload?.user_ref_id);
 
@@ -341,7 +360,7 @@ export const createUser = async (
           "utf-8",
         );
         updateObj.password = await userService.passwordChangetoEncrypt(
-          decodedPassword,
+          password,
           1,
         );
       }
@@ -369,7 +388,7 @@ export const createUser = async (
       ? Buffer.from(password, "base64").toString("utf-8")
       : password;
     const decodePassword = await userService.passwordChangetoEncrypt(
-      decodedPassword,
+      password,
       1,
     );
     const isActiveDefault = true;
@@ -389,7 +408,7 @@ export const createUser = async (
       console.log(createUser?.dataValues, "createUser");
       const user_id = createUser?.dataValues?.user_id;
       obj.user_id = user_id;
-      obj.role_id = 2;
+      obj.role_id = role_id;
       await UserRoleMapping.create(obj, { transaction });
     });
 
