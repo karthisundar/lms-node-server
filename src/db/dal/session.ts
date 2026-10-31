@@ -23,9 +23,10 @@ export const createSession = async (
   try {
     const sessionRefId = queryData?.sessionRefId?.trim();
 
-    const sessionName = queryData?.name?.trim();
+    const sessionName = (queryData?.sessionName || queryData?.name)?.trim();
     const description = queryData?.description?.trim() || null;
-    const date = queryData?.date ? new Date(queryData.date) : null;
+    const rawDate = queryData?.sessionDate || queryData?.date;
+    const date = rawDate ? new Date(rawDate) : null;
     const status = queryData?.status || "draft";
 
     if (!sessionName) {

@@ -1,6 +1,6 @@
 import http from 'http'
 import cors from 'cors';
-import express, { request } from 'express';
+import express from 'express';
 import errorHandler from '../src/middleware/error-handler'
 import registerRoutes from './routes';
 import helmet from 'helmet';

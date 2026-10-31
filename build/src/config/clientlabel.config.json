@@ -650,5 +650,250 @@
                 "message": "Exceeded limit: The maximum quantity allowed is 2,147,483,647."
             }
         }
+    },
+    "COURSE_E_00001": {
+        "code": "COURSE_E_00001",
+        "message": "Course not found.",
+        "type": "Error"
+    },
+    "COURSE_E_00002": {
+        "code": "COURSE_E_00002",
+        "message": "Course name is mandatory.",
+        "type": "Error"
+    },
+    "COURSE_S_00001": {
+        "code": "COURSE_S_00001",
+        "message": "Course created successfully.",
+        "type": "Success"
+    },
+    "COURSE_S_00002": {
+        "code": "COURSE_S_00002",
+        "message": "Course updated successfully.",
+        "type": "Success"
+    },
+    "COURSE_S_00003": {
+        "code": "COURSE_S_00003",
+        "message": "Course deleted successfully.",
+        "type": "Success"
+    },
+    "MODULE_E_00001": {
+        "code": "MODULE_E_00001",
+        "message": "Module not found.",
+        "type": "Error"
+    },
+    "MODULE_E_00002": {
+        "code": "MODULE_E_00002",
+        "message": "Module name is mandatory.",
+        "type": "Error"
+    },
+    "MODULE_E_00004": {
+        "code": "MODULE_E_00004",
+        "message": "Module not found.",
+        "type": "Error"
+    },
+    "MODULE_E_00005": {
+        "code": "MODULE_E_00005",
+        "message": "Associated course not found.",
+        "type": "Error"
+    },
+    "MODULE_S_00001": {
+        "code": "MODULE_S_00001",
+        "message": "Module created successfully.",
+        "type": "Success"
+    },
+    "MODULE_S_00002": {
+        "code": "MODULE_S_00002",
+        "message": "Module updated successfully.",
+        "type": "Success"
+    },
+    "MODULE_S_00003": {
+        "code": "MODULE_S_00003",
+        "message": "Module deleted successfully.",
+        "type": "Success"
+    },
+    "LESSON_E_00001": {
+        "code": "LESSON_E_00001",
+        "message": "Lesson not found.",
+        "type": "Error"
+    },
+    "LESSON_E_00002": {
+        "code": "LESSON_E_00002",
+        "message": "Lesson name is mandatory.",
+        "type": "Error"
+    },
+    "LESSON_E_00003": {
+        "code": "LESSON_E_00003",
+        "message": "Module reference is mandatory.",
+        "type": "Error"
+    },
+    "LESSON_E_00004": {
+        "code": "LESSON_E_00004",
+        "message": "Video reference is mandatory.",
+        "type": "Error"
+    },
+    "LESSON_E_00005": {
+        "code": "LESSON_E_00005",
+        "message": "Lesson not found.",
+        "type": "Error"
+    },
+    "LESSON_S_00001": {
+        "code": "LESSON_S_00001",
+        "message": "Lesson created successfully.",
+        "type": "Success"
+    },
+    "LESSON_S_00002": {
+        "code": "LESSON_S_00002",
+        "message": "Lesson updated successfully.",
+        "type": "Success"
+    },
+    "LESSON_S_00003": {
+        "code": "LESSON_S_00003",
+        "message": "Lesson deleted successfully.",
+        "type": "Success"
+    },
+    "VIDEO_E_00001": {
+        "code": "VIDEO_E_00001",
+        "message": "Video not found.",
+        "type": "Error"
+    },
+    "VIDEO_E_00002": {
+        "code": "VIDEO_E_00002",
+        "message": "Video title is mandatory.",
+        "type": "Error"
+    },
+    "VIDEO_E_00003": {
+        "code": "VIDEO_E_00003",
+        "message": "Video file or URL is mandatory.",
+        "type": "Error"
+    },
+    "VIDEO_E_00004": {
+        "code": "VIDEO_E_00004",
+        "message": "Bucket reference is mandatory.",
+        "type": "Error"
+    },
+    "VIDEO_E_00005": {
+        "code": "VIDEO_E_00005",
+        "message": "Video duration is mandatory.",
+        "type": "Error"
+    },
+    "VIDEO_E_00006": {
+        "code": "VIDEO_E_00006",
+        "message": "External video URL is mandatory.",
+        "type": "Error"
+    },
+    "VIDEO_S_00001": {
+        "code": "VIDEO_S_00001",
+        "message": "Video created successfully.",
+        "type": "Success"
+    },
+    "VIDEO_S_00002": {
+        "code": "VIDEO_S_00002",
+        "message": "Video updated successfully.",
+        "type": "Success"
+    },
+    "VIDEO_S_00003": {
+        "code": "VIDEO_S_00003",
+        "message": "Video deleted successfully.",
+        "type": "Success"
+    },
+    "SESSION_E_00001": {
+        "code": "SESSION_E_00001",
+        "message": "Session not found.",
+        "type": "Error"
+    },
+    "SESSION_E_00002": {
+        "code": "SESSION_E_00002",
+        "message": "Session name is mandatory.",
+        "type": "Error"
+    },
+    "SESSION_E_00003": {
+        "code": "SESSION_E_00003",
+        "message": "Session date is mandatory.",
+        "type": "Error"
+    },
+    "SESSION_E_00004": {
+        "code": "SESSION_E_00004",
+        "message": "Session mapping not found.",
+        "type": "Error"
+    },
+    "SESSION_S_00001": {
+        "code": "SESSION_S_00001",
+        "message": "Session created successfully.",
+        "type": "Success"
+    },
+    "SESSION_S_00002": {
+        "code": "SESSION_S_00002",
+        "message": "Session updated successfully.",
+        "type": "Success"
+    },
+    "SESSION_S_00003": {
+        "code": "SESSION_S_00003",
+        "message": "Session deleted successfully.",
+        "type": "Success"
+    },
+    "LESSON_VIDEO_MAPPING_E_00001": {
+        "code": "LESSON_VIDEO_MAPPING_E_00001",
+        "message": "Lesson video mapping already exists.",
+        "type": "Error"
+    },
+    "LESSON_VIDEO_MAPPING_E_00002": {
+        "code": "LESSON_VIDEO_MAPPING_E_00002",
+        "message": "Lesson video mapping not found.",
+        "type": "Error"
+    },
+    "LESSON_VIDEO_MAPPING_E_00003": {
+        "code": "LESSON_VIDEO_MAPPING_E_00003",
+        "message": "Lesson and video references are mandatory.",
+        "type": "Error"
+    },
+    "LESSON_NOTES_E_00001": {
+        "code": "LESSON_NOTES_E_00001",
+        "message": "Lesson notes not found.",
+        "type": "Error"
+    },
+    "LESSON_NOTES_E_00002": {
+        "code": "LESSON_NOTES_E_00002",
+        "message": "Lesson reference is mandatory.",
+        "type": "Error"
+    },
+    "LESSON_NOTES_E_00003": {
+        "code": "LESSON_NOTES_E_00003",
+        "message": "Lesson notes title is mandatory.",
+        "type": "Error"
+    },
+    "USER_SESSION_E_00001": {
+        "code": "USER_SESSION_E_00001",
+        "message": "User session mapping not found.",
+        "type": "Error"
+    },
+    "USER_SESSION_E_00002": {
+        "code": "USER_SESSION_E_00002",
+        "message": "User reference is mandatory.",
+        "type": "Error"
+    },
+    "USER_SESSION_E_00003": {
+        "code": "USER_SESSION_E_00003",
+        "message": "Session reference is mandatory.",
+        "type": "Error"
+    },
+    "USER_SESSION_E_00004": {
+        "code": "USER_SESSION_E_00004",
+        "message": "User session mapping already exists.",
+        "type": "Error"
+    },
+    "USER_SESSION_E_00005": {
+        "code": "USER_SESSION_E_00005",
+        "message": "Invalid user session mapping data.",
+        "type": "Error"
+    },
+    "USER_LESSON_E_00001": {
+        "code": "USER_LESSON_E_00001",
+        "message": "User lesson mapping not found.",
+        "type": "Error"
+    },
+    "USER_LESSON_E_00002": {
+        "code": "USER_LESSON_E_00002",
+        "message": "User and lesson references are mandatory.",
+        "type": "Error"
     }
 }

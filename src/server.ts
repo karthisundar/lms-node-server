@@ -7,7 +7,8 @@ import { AddressInfo } from 'net';
 import App from './App';
 import logger from './lib/logger';
 import dbInit from './db/init';
-
+// Initialize contact enquiry email background worker
+import './workers/contactEnquiryEmailWorker';
 
 dbInit();
 const app: App = new App();
@@ -25,7 +26,6 @@ function serverListening(): void {
     const addressInfo: AddressInfo = <AddressInfo>server.address();
     logger.info(`Listening on ${addressInfo.address}:${env.port}`);
 }
-
 
 app.init()
     .then(() => {

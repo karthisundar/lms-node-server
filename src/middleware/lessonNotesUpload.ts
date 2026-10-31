@@ -60,14 +60,14 @@ const lessonNotesUpload = multer({
 
     contentType: multerS3.AUTO_CONTENT_TYPE,
 
-    metadata: (req, file, cb) => {
+    metadata: (req: any, file: any, cb: any) => {
       cb(null, {
         fieldName: file.fieldname,
         originalName: file.originalname,
       });
     },
 
-    key: (req, file, cb) => {
+    key: (req: any, file: any, cb: any) => {
       const timestamp = Date.now();
 
       const sanitizedFileName = file.originalname

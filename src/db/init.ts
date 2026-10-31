@@ -19,6 +19,9 @@ import VideoWatchProgress from "./model/VideoWatchProgress";
 import LecturerCourseMapping from "./model/LecturerCourseMapping";
 import QuestionMaster from "./model/QuestionMaster";
 import QuestionAnswer from "./model/QuestionAnswer";
+import ContactEnquiry from "./model/ContactEnquiry";
+import ContactEnquiryEmailLog from "./model/ContactEnquiryEmailLog";
+import "./model/associations";
 
 const dbInit = () =>
   Promise.all([
@@ -43,6 +46,8 @@ const dbInit = () =>
     LecturerCourseMapping.sync(),
     QuestionMaster.sync(),
     QuestionAnswer.sync(),
+    ContactEnquiry.sync(),
+    ContactEnquiryEmailLog.sync(),
   ]);
 
 export default dbInit;

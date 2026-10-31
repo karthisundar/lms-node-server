@@ -77,13 +77,17 @@ exports.signJWT = signJWT;
 // verify jwt
 const verifyJWT = (token) => {
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, publicKey);
-        return { payload: decoded, expired: false, token };
+        if (!token || typeof token !== 'string') {
+            return { payload: null, expired: false };
+        }
+        const cleanToken = token.replace(/^Bearer\s+/i, '').trim();
+        const decoded = jsonwebtoken_1.default.verify(cleanToken, publicKey);
+        return { payload: decoded, expired: false, token: cleanToken };
     }
     catch (error) {
         return {
             payload: null,
-            expired: error.message.includes('Jwt token was expired'),
+            expired: Boolean(error?.message?.includes('Jwt token was expired') || error?.message?.includes('jwt expired')),
         };
     }
 };

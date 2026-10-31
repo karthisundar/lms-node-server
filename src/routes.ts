@@ -7,6 +7,7 @@ import { CourseController } from "./components/course/course.controller";
 import { ModuleController } from "./components/module/module.controller";
 import { LessionController } from "./components/lesson/lesson.controller";
 import QuestionController from "./components/question/question.controller";
+import ContactController from "./components/contact/contact.controller";
 
 export default function registerRoutes(): Router {
   const router = Router();
@@ -34,6 +35,10 @@ export default function registerRoutes(): Router {
 
   const questionController = new QuestionController();
   router.use("/api/question", questionController.register());
+
+  // Contact Enquiry and Admin routes
+  const contactController = new ContactController();
+  router.use(contactController.register());
 
   return router;
 }

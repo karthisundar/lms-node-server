@@ -73,14 +73,18 @@ export const signJWT = async(payload: object, expiresIn: string | number) : Prom
 
 
 // verify jwt
-export const verifyJWT = (token: string) => {
+export const verifyJWT = (token: string): { payload: any; expired: boolean; token?: string } => {
 	try {
-		const decoded = jwt.verify(token, publicKey);
-		return { payload: decoded, expired: false, token };
-	} catch (error) {
+		if (!token || typeof token !== 'string') {
+			return { payload: null, expired: false };
+		}
+		const cleanToken = token.replace(/^Bearer\s+/i, '').trim();
+		const decoded = jwt.verify(cleanToken, publicKey);
+		return { payload: decoded, expired: false, token: cleanToken };
+	} catch (error: any) {
 		return {
 			payload: null,
-			expired: error.message.includes('Jwt token was expired'),
+			expired: Boolean(error?.message?.includes('Jwt token was expired') || error?.message?.includes('jwt expired')),
 		};
 	}
 };

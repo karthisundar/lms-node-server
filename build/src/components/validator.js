@@ -12,15 +12,27 @@ const validator = (validator) => async (req, res, next) => {
     if (error.isEmpty()) {
         return next();
     }
-    logger_1.default.error("error from validator", error.array().map((d) => d.msg));
+    const errorList = error.array();
+    logger_1.default.error("error from validator", errorList.map((d) => d.msg));
+    const firstMsg = String(errorList[0]?.msg || "Validation error");
+    const isEmailDup = firstMsg.toLowerCase().includes("already registered") ||
+        firstMsg.toLowerCase().includes("already exists");
+    const code = isEmailDup ? "EMAIL_ALREADY_EXISTS" : firstMsg;
+    const field = isEmailDup ? "email" : (errorList[0]?.path || errorList[0]?.param);
     res.status(400).json({
         statusCode: 400,
+        success: false,
+        code,
+        message: firstMsg,
+        field,
         response: {
-            code: error.array().map((d) => d.msg),
+            code: errorList.map((d) => d.msg),
             name: "error",
-            stack: error.array(),
+            message: firstMsg,
+            stack: errorList,
         },
     });
 };
 exports.validator = validator;
+exports.default = exports.validator;
 //# sourceMappingURL=validator.js.map

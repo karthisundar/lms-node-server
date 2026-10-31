@@ -132,16 +132,22 @@ const login = async (userData) => {
     }
     catch (error) {
         transaction.rollback();
-        throw new Error(error);
+        throw new Error(error instanceof Error ? error.message : String(error));
     }
 };
 exports.login = login;
 const logout = async (token) => {
+    if (!token) {
+        return true;
+    }
+    const cleanToken = typeof token === "string" ? token.replace(/^Bearer\s+/i, "").trim() : token;
     const transaction = await config_1.default.transaction();
     try {
-        const updateTable = await UserToken_1.default.destroy({
+        await UserToken_1.default.destroy({
             where: {
-                token,
+                token: {
+                    [sequelize_1.Op.in]: [token, cleanToken],
+                },
             },
             transaction,
         });
@@ -150,7 +156,7 @@ const logout = async (token) => {
     }
     catch (error) {
         await transaction.rollback();
-        throw new Error(error);
+        throw new Error(error instanceof Error ? error.message : String(error));
     }
 };
 exports.logout = logout;
@@ -177,7 +183,7 @@ const setPassword = async (req, bodyData) => {
         confirmPasswords = global.atob(bodyData?.confirmPassword);
     }
     catch (error) {
-        throw new Error(error);
+        throw new Error(error instanceof Error ? error.message : String(error));
     }
     let findUserData = await User_1.default.findOne({
         where: {
@@ -214,15 +220,31 @@ const setPassword = async (req, bodyData) => {
     }
 };
 exports.setPassword = setPassword;
-const getActionUser = async (user_ref_id) => {
-    const findUser = await User_1.default.findOne({
-        where: {
-            user_ref_id,
-        },
-        nest: true,
-        raw: true,
-    });
-    return findUser;
+const getActionUser = async (user_ref_id, userId) => {
+    try {
+        if (user_ref_id && typeof user_ref_id === 'string' && user_ref_id.trim()) {
+            const findUser = await User_1.default.findOne({
+                where: { user_ref_id: user_ref_id.trim() },
+                nest: true,
+                raw: true,
+            });
+            if (findUser)
+                return findUser;
+        }
+        if (userId) {
+            const findUser = await User_1.default.findOne({
+                where: { user_id: userId },
+                nest: true,
+                raw: true,
+            });
+            if (findUser)
+                return findUser;
+        }
+        return null;
+    }
+    catch {
+        return null;
+    }
 };
 exports.getActionUser = getActionUser;
 const getAllUser = async (queryData) => {
@@ -272,11 +294,19 @@ const getAllUser = async (queryData) => {
 exports.getAllUser = getAllUser;
 const sequelize_1 = require("sequelize");
 const checkCreateUser = async (queryData) => {
-    const name = queryData?.name;
-    const email = queryData?.email;
+    const name = queryData?.name?.trim();
+    const rawEmail = queryData?.email;
+    const email = rawEmail ? rawEmail.trim().toLowerCase() : undefined;
     const password = queryData?.password;
     const phone_number = queryData?.phoneNumber;
     const user_ref_id = queryData?.user_ref_id;
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email && !EMAIL_REGEX.test(email)) {
+        const err = new Error("Invalid email format");
+        err.status = 400;
+        err.field = "email";
+        throw err;
+    }
     // ---- UPDATE FLOW ----
     if (user_ref_id) {
         const findUser = await User_1.default.findOne({ where: { user_ref_id } });
@@ -286,12 +316,18 @@ const checkCreateUser = async (queryData) => {
         if (email) {
             const checkEmail = await User_1.default.findOne({
                 where: {
-                    email,
-                    user_ref_id: { [sequelize_1.Op.ne]: user_ref_id },
+                    [sequelize_1.Op.and]: [
+                        config_1.default.where(config_1.default.fn("LOWER", config_1.default.col("email")), email),
+                        { user_ref_id: { [sequelize_1.Op.ne]: user_ref_id } },
+                    ],
                 },
             });
             if (checkEmail) {
-                throw new Error("Email Already exists");
+                const err = new Error("This email address is already registered.");
+                err.code = "EMAIL_ALREADY_EXISTS";
+                err.status = 409;
+                err.field = "email";
+                throw err;
             }
         }
         // password not mandatory on update, only validate if provided
@@ -306,12 +342,14 @@ const checkCreateUser = async (queryData) => {
     // ---- CREATE FLOW ----
     if (email) {
         const checkEmail = await User_1.default.findOne({
-            where: {
-                email,
-            },
+            where: config_1.default.where(config_1.default.fn("LOWER", config_1.default.col("email")), email),
         });
         if (checkEmail) {
-            throw new Error("Email Already exists");
+            const err = new Error("This email address is already registered.");
+            err.code = "EMAIL_ALREADY_EXISTS";
+            err.status = 409;
+            err.field = "email";
+            throw err;
         }
     }
     if (!password) {
@@ -321,12 +359,12 @@ const checkCreateUser = async (queryData) => {
 exports.checkCreateUser = checkCreateUser;
 const createUser = async (queryData, payload) => {
     try {
-        const name = queryData?.name;
-        const email = queryData?.email;
+        const name = queryData?.name?.trim();
+        const rawEmail = queryData?.email;
+        const email = rawEmail ? rawEmail.trim().toLowerCase() : undefined;
         const password = queryData?.password;
         const phone_number = queryData?.phoneNumber;
         const user_ref_id = queryData?.user_ref_id;
-        // console.log(user_ref_id, "user_ref_iduser_ref_id", payload);
         const is_active = queryData?.is_active ?? queryData?.active;
         let role_id = 2;
         const role = queryData?.role;
@@ -338,7 +376,7 @@ const createUser = async (queryData, payload) => {
                 nest: true,
                 raw: true,
             });
-            role_id = findRole?.role_id;
+            role_id = findRole?.role_id ?? 2;
         }
         const findUser = await (0, exports.getActionUser)(payload?.user_ref_id);
         // ---- UPDATE FLOW: user_ref_id present ----
@@ -349,9 +387,11 @@ const createUser = async (queryData, payload) => {
                 updatedBy: findUser?.user_id,
                 updatedAt: new Date(),
             };
+            if (email) {
+                updateObj.email = email;
+            }
             // password comes base64 (btoa) encoded, decode then encrypt
             if (password) {
-                const decodedPassword = Buffer.from(password, "base64").toString("utf-8");
                 updateObj.password = await userService.passwordChangetoEncrypt(password, 1);
             }
             // active/inactive flag, only update if explicitly present
@@ -359,7 +399,6 @@ const createUser = async (queryData, payload) => {
                 updateObj.is_active = is_active;
                 updateObj.status = is_active;
             }
-            // console.log(user_ref_id, "from update");
             await config_1.default.transaction(async (transaction) => {
                 await User_1.default.update(updateObj, {
                     where: { user_ref_id },
@@ -369,9 +408,6 @@ const createUser = async (queryData, payload) => {
             return true;
         }
         // ---- CREATE FLOW: user_ref_id not present, create new user ----
-        const decodedPassword = password
-            ? Buffer.from(password, "base64").toString("utf-8")
-            : password;
         const decodePassword = await userService.passwordChangetoEncrypt(password, 1);
         const isActiveDefault = true;
         let obj = {
@@ -385,9 +421,8 @@ const createUser = async (queryData, payload) => {
             status: isActiveDefault,
         };
         await config_1.default.transaction(async (transaction) => {
-            const createUser = await User_1.default.create(obj, { transaction });
-            console.log(createUser?.dataValues, "createUser");
-            const user_id = createUser?.dataValues?.user_id;
+            const newUser = await User_1.default.create(obj, { transaction });
+            const user_id = newUser?.dataValues?.user_id;
             obj.user_id = user_id;
             obj.role_id = role_id;
             await UserMaping_1.default.create(obj, { transaction });
@@ -395,8 +430,17 @@ const createUser = async (queryData, payload) => {
         return true;
     }
     catch (error) {
+        if (error?.name === "SequelizeUniqueConstraintError" ||
+            error?.original?.code === "ER_DUP_ENTRY" ||
+            error?.code === "EMAIL_ALREADY_EXISTS") {
+            const err = new Error("This email address is already registered.");
+            err.code = "EMAIL_ALREADY_EXISTS";
+            err.status = 409;
+            err.field = "email";
+            throw err;
+        }
         logger_1.default.error("Error createUser/user.ts", error);
-        throw new Error(error);
+        throw error;
     }
 };
 exports.createUser = createUser;
@@ -441,17 +485,34 @@ const deleteUser = async (queryData, payload) => {
     }
     catch (error) {
         logger_1.default.error("Error DeleteUser", error);
-        throw new Error(error);
+        throw new Error(error instanceof Error ? error.message : String(error));
     }
 };
 exports.deleteUser = deleteUser;
 const getUserDetails = async (userRefId, payload) => {
     try {
-        const newRefId = userRefId ? userRefId : payload?.user_ref_id;
+        let targetRefId;
+        if (typeof userRefId === "string" && userRefId.trim()) {
+            targetRefId = userRefId.trim();
+        }
+        else if (typeof userRefId === "object" && userRefId !== null) {
+            targetRefId = userRefId.userRefId || userRefId.user_ref_id || userRefId.id;
+        }
+        if (!targetRefId) {
+            targetRefId = payload?.user_ref_id || payload?.userRefId;
+        }
+        let whereClause = {};
+        if (targetRefId) {
+            whereClause.user_ref_id = targetRefId;
+        }
+        else if (payload?.user_id || payload?.id) {
+            whereClause.user_id = payload.user_id || payload.id;
+        }
+        else {
+            throw new Error("USER_E_00001");
+        }
         const user = await User_1.default.findOne({
-            where: {
-                user_ref_id: newRefId,
-            },
+            where: whereClause,
             attributes: [
                 "user_id",
                 "user_ref_id",

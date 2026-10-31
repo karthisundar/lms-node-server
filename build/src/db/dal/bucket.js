@@ -42,7 +42,7 @@ const sessionUser = async (queryData, payload) => {
     }
     catch (error) {
         logger_1.default.error("Error sessionUserError", error);
-        throw new Error(error);
+        throw new Error(error instanceof Error ? error.message : String(error));
     }
 };
 exports.sessionUser = sessionUser;
@@ -245,18 +245,28 @@ const createBucket = async (queryData, payload) => {
     try {
         const bucketRefId = queryData?.bucketRefId?.trim();
         const bucketName = queryData?.bucketName?.trim();
-        const serviceUrl = queryData?.serviceUrl?.trim();
-        const status = queryData?.status ?? 1;
+        const serviceUrl = queryData?.serviceUrl?.trim() || queryData?.url?.trim() || 'https://s3.amazonaws.com';
+        let status = 1;
+        if (queryData?.status !== undefined && queryData?.status !== null) {
+            if (typeof queryData.status === 'boolean') {
+                status = queryData.status ? 1 : 0;
+            }
+            else if (typeof queryData.status === 'string') {
+                status = queryData.status.toLowerCase() === 'active' || queryData.status === '1' ? 1 : 0;
+            }
+            else {
+                status = Number(queryData.status) || 0;
+            }
+        }
+        if (!bucketName) {
+            throw new Error("Bucket name is mandatory.");
+        }
         // Get logged-in/action user
-        const findUser = await (0, user_1.getActionUser)(payload?.user_ref_id);
-        // =====================================================
+        const findUser = await (0, user_1.getActionUser)(payload?.user_ref_id, payload?.user_id || payload?.id);
         // UPDATE FLOW
-        // =====================================================
         if (bucketRefId) {
             const existingBucket = await BucketMaster_1.default.findOne({
-                where: {
-                    bucketRefId,
-                },
+                where: { bucketRefId },
             });
             if (!existingBucket) {
                 throw new Error("BUCKET_E_00001");
@@ -270,19 +280,16 @@ const createBucket = async (queryData, payload) => {
             };
             await config_1.default.transaction(async (transaction) => {
                 await BucketMaster_1.default.update(updateObj, {
-                    where: {
-                        bucketRefId,
-                    },
+                    where: { bucketRefId },
                     transaction,
                 });
             });
-            return true;
+            return { bucketRefId, bucketName, serviceUrl, status };
         }
-        // =====================================================
         // CREATE FLOW
-        // =====================================================
+        const newRefId = (0, crypto_1.randomUUID)();
         const newBucketObj = {
-            bucketRefId: (0, crypto_1.randomUUID)(),
+            bucketRefId: newRefId,
             bucketName,
             serviceUrl,
             status,
@@ -290,11 +297,9 @@ const createBucket = async (queryData, payload) => {
             createdAt: new Date(),
         };
         await config_1.default.transaction(async (transaction) => {
-            await BucketMaster_1.default.create(newBucketObj, {
-                transaction,
-            });
+            await BucketMaster_1.default.create(newBucketObj, { transaction });
         });
-        return true;
+        return newBucketObj;
     }
     catch (error) {
         logger_1.default.error("Error createBucket/bucketMaster.ts", error);

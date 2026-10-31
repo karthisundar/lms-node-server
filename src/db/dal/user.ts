@@ -108,17 +108,23 @@ export const login = async (userData: any): Promise<any> => {
     return tokens;
   } catch (error) {
     transaction.rollback();
-    throw new Error(error);
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 };
 
 export const logout = async (token: any): Promise<any> => {
+  if (!token) {
+    return true;
+  }
+  const cleanToken = typeof token === "string" ? token.replace(/^Bearer\s+/i, "").trim() : token;
   const transaction = await sequelizeConnection.transaction();
 
   try {
-    const updateTable = await User_token.destroy({
+    await User_token.destroy({
       where: {
-        token,
+        token: {
+          [Op.in]: [token, cleanToken],
+        },
       },
       transaction,
     });
@@ -126,7 +132,7 @@ export const logout = async (token: any): Promise<any> => {
     return true;
   } catch (error) {
     await transaction.rollback();
-    throw new Error(error);
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 };
 
@@ -155,7 +161,7 @@ export const setPassword = async (req: any, bodyData: any): Promise<any> => {
     newPassword = global.atob(bodyData?.password);
     confirmPasswords = global.atob(bodyData?.confirmPassword);
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 
   let findUserData = await User.findOne({
@@ -204,15 +210,28 @@ export const setPassword = async (req: any, bodyData: any): Promise<any> => {
   }
 };
 
-export const getActionUser = async (user_ref_id: string): Promise<User> => {
-  const findUser = await User.findOne({
-    where: {
-      user_ref_id,
-    },
-    nest: true,
-    raw: true,
-  });
-  return findUser;
+export const getActionUser = async (user_ref_id?: any, userId?: any): Promise<any> => {
+  try {
+    if (user_ref_id && typeof user_ref_id === 'string' && user_ref_id.trim()) {
+      const findUser = await User.findOne({
+        where: { user_ref_id: user_ref_id.trim() },
+        nest: true,
+        raw: true,
+      });
+      if (findUser) return findUser;
+    }
+    if (userId) {
+      const findUser = await User.findOne({
+        where: { user_id: userId },
+        nest: true,
+        raw: true,
+      });
+      if (findUser) return findUser;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 };
 
 export const getAllUser = async (queryData: any): Promise<any> => {
@@ -265,11 +284,20 @@ export const getAllUser = async (queryData: any): Promise<any> => {
 import { Op } from "sequelize";
 
 export const checkCreateUser = async (queryData: any): Promise<any> => {
-  const name = queryData?.name;
-  const email = queryData?.email;
+  const name = queryData?.name?.trim();
+  const rawEmail = queryData?.email;
+  const email = rawEmail ? rawEmail.trim().toLowerCase() : undefined;
   const password = queryData?.password;
   const phone_number = queryData?.phoneNumber;
   const user_ref_id = queryData?.user_ref_id;
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (email && !EMAIL_REGEX.test(email)) {
+    const err: any = new Error("Invalid email format");
+    err.status = 400;
+    err.field = "email";
+    throw err;
+  }
 
   // ---- UPDATE FLOW ----
   if (user_ref_id) {
@@ -281,12 +309,21 @@ export const checkCreateUser = async (queryData: any): Promise<any> => {
     if (email) {
       const checkEmail = await User.findOne({
         where: {
-          email,
-          user_ref_id: { [Op.ne]: user_ref_id },
+          [Op.and]: [
+            sequelizeConnection.where(
+              sequelizeConnection.fn("LOWER", sequelizeConnection.col("email")),
+              email
+            ),
+            { user_ref_id: { [Op.ne]: user_ref_id } },
+          ],
         },
       });
       if (checkEmail) {
-        throw new Error("Email Already exists");
+        const err: any = new Error("This email address is already registered.");
+        err.code = "EMAIL_ALREADY_EXISTS";
+        err.status = 409;
+        err.field = "email";
+        throw err;
       }
     }
 
@@ -304,12 +341,17 @@ export const checkCreateUser = async (queryData: any): Promise<any> => {
   // ---- CREATE FLOW ----
   if (email) {
     const checkEmail = await User.findOne({
-      where: {
-        email,
-      },
+      where: sequelizeConnection.where(
+        sequelizeConnection.fn("LOWER", sequelizeConnection.col("email")),
+        email
+      ),
     });
     if (checkEmail) {
-      throw new Error("Email Already exists");
+      const err: any = new Error("This email address is already registered.");
+      err.code = "EMAIL_ALREADY_EXISTS";
+      err.status = 409;
+      err.field = "email";
+      throw err;
     }
   }
 
@@ -323,12 +365,12 @@ export const createUser = async (
   payload: any,
 ): Promise<any> => {
   try {
-    const name = queryData?.name;
-    const email = queryData?.email;
+    const name = queryData?.name?.trim();
+    const rawEmail = queryData?.email;
+    const email = rawEmail ? rawEmail.trim().toLowerCase() : undefined;
     const password = queryData?.password;
     const phone_number = queryData?.phoneNumber;
     const user_ref_id = queryData?.user_ref_id;
-    // console.log(user_ref_id, "user_ref_iduser_ref_id", payload);
     const is_active = queryData?.is_active ?? queryData?.active;
     let role_id: number = 2;
     const role = queryData?.role;
@@ -340,7 +382,7 @@ export const createUser = async (
         nest: true,
         raw: true,
       });
-      role_id = findRole?.role_id;
+      role_id = findRole?.role_id ?? 2;
     }
 
     const findUser = await getActionUser(payload?.user_ref_id);
@@ -354,11 +396,12 @@ export const createUser = async (
         updatedAt: new Date(),
       };
 
+      if (email) {
+        updateObj.email = email;
+      }
+
       // password comes base64 (btoa) encoded, decode then encrypt
       if (password) {
-        const decodedPassword = Buffer.from(password, "base64").toString(
-          "utf-8",
-        );
         updateObj.password = await userService.passwordChangetoEncrypt(
           password,
           1,
@@ -370,7 +413,6 @@ export const createUser = async (
         updateObj.is_active = is_active;
         updateObj.status = is_active;
       }
-      // console.log(user_ref_id, "from update");
 
       await sequelizeConnection.transaction(
         async (transaction: Transaction) => {
@@ -384,9 +426,6 @@ export const createUser = async (
     }
 
     // ---- CREATE FLOW: user_ref_id not present, create new user ----
-    const decodedPassword = password
-      ? Buffer.from(password, "base64").toString("utf-8")
-      : password;
     const decodePassword = await userService.passwordChangetoEncrypt(
       password,
       1,
@@ -404,18 +443,28 @@ export const createUser = async (
     };
 
     await sequelizeConnection.transaction(async (transaction: Transaction) => {
-      const createUser = await User.create(obj, { transaction });
-      console.log(createUser?.dataValues, "createUser");
-      const user_id = createUser?.dataValues?.user_id;
+      const newUser = await User.create(obj, { transaction });
+      const user_id = newUser?.dataValues?.user_id;
       obj.user_id = user_id;
       obj.role_id = role_id;
       await UserRoleMapping.create(obj, { transaction });
     });
 
     return true;
-  } catch (error) {
+  } catch (error: any) {
+    if (
+      error?.name === "SequelizeUniqueConstraintError" ||
+      error?.original?.code === "ER_DUP_ENTRY" ||
+      error?.code === "EMAIL_ALREADY_EXISTS"
+    ) {
+      const err: any = new Error("This email address is already registered.");
+      err.code = "EMAIL_ALREADY_EXISTS";
+      err.status = 409;
+      err.field = "email";
+      throw err;
+    }
     logger.error("Error createUser/user.ts", error);
-    throw new Error(error);
+    throw error;
   }
 };
 
@@ -465,21 +514,36 @@ export const deleteUser = async (
     });
   } catch (error) {
     logger.error("Error DeleteUser", error);
-    throw new Error(error);
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 };
 
 export const getUserDetails = async (
-  userRefId: string,
+  userRefId: any,
   payload?: any,
 ): Promise<any> => {
   try {
-    const newRefId = userRefId ? userRefId : payload?.user_ref_id;
+    let targetRefId: string | undefined;
+    if (typeof userRefId === "string" && userRefId.trim()) {
+      targetRefId = userRefId.trim();
+    } else if (typeof userRefId === "object" && userRefId !== null) {
+      targetRefId = userRefId.userRefId || userRefId.user_ref_id || userRefId.id;
+    }
+    if (!targetRefId) {
+      targetRefId = payload?.user_ref_id || payload?.userRefId;
+    }
+
+    let whereClause: any = {};
+    if (targetRefId) {
+      whereClause.user_ref_id = targetRefId;
+    } else if (payload?.user_id || payload?.id) {
+      whereClause.user_id = payload.user_id || payload.id;
+    } else {
+      throw new Error("USER_E_00001");
+    }
 
     const user = await User.findOne({
-      where: {
-        user_ref_id: newRefId,
-      },
+      where: whereClause,
       attributes: [
         "user_id",
         "user_ref_id",

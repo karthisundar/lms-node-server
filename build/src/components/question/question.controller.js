@@ -41,6 +41,7 @@ const logger_1 = __importDefault(require("../../lib/logger"));
 const http_status_codes_1 = require("http-status-codes");
 const ApiResponses_1 = require("../../abstractions/ApiResponses");
 const service = __importStar(require("./question.service"));
+const jwt_utils_1 = require("../auth/jwt.utils");
 class QuestionController extends BaseApi_1.default {
     constructor() {
         super();
@@ -48,6 +49,8 @@ class QuestionController extends BaseApi_1.default {
     register() {
         this.router.get("/getAllQuestions", this.getAllQuestions.bind(this));
         this.router.get("/getQuestionByRefId", this.getQuestionByRefId.bind(this));
+        this.router.get("/getEditorQuestions", this.getEditorQuestions.bind(this));
+        this.router.post("/checkSyntax", this.checkSyntax.bind(this));
         this.router.post("/createOrUpdateQuestion", this.createOrUpdateQuestion.bind(this));
         this.router.post("/createQuestion", this.createOrUpdateQuestion.bind(this));
         this.router.post("/deleteQuestion", this.deleteQuestion.bind(this));
@@ -55,6 +58,92 @@ class QuestionController extends BaseApi_1.default {
         this.router.post("/updateQuestionAnswer", this.updateQuestionAnswer.bind(this));
         this.router.post("/deleteQuestionAnswer", this.deleteQuestionAnswer.bind(this));
         return this.router;
+    }
+    async verifyUserRole(req) {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.trim()) {
+            return null;
+        }
+        const token = authHeader.startsWith("Bearer ")
+            ? authHeader.slice(7)
+            : authHeader;
+        const decoded = await (0, jwt_utils_1.verifyJWT)(token);
+        const payload = decoded?.payload;
+        if (!payload)
+            return null;
+        // Strict role check: User role only (role_id === 2 or role === 'user')
+        const roleId = Number(payload.role_id);
+        const role = String(payload.role || "").toLowerCase();
+        if (roleId === 2 || role === "user") {
+            return payload;
+        }
+        return false; // Valid token but forbidden role (admin/lecturer)
+    }
+    async checkSyntax(req, res, next) {
+        try {
+            const userPayload = await this.verifyUserRole(req);
+            if (userPayload === null) {
+                res.status(http_status_codes_1.StatusCodes.UNAUTHORIZED).json({
+                    statusCode: http_status_codes_1.StatusCodes.UNAUTHORIZED,
+                    response: {
+                        code: "UNAUTHORIZED",
+                        message: "Authentication token required.",
+                    },
+                });
+                return;
+            }
+            if (userPayload === false) {
+                res.status(http_status_codes_1.StatusCodes.FORBIDDEN).json({
+                    statusCode: http_status_codes_1.StatusCodes.FORBIDDEN,
+                    response: {
+                        code: "FORBIDDEN",
+                        message: "Access denied. Python editor and syntax checking is restricted to the User role only.",
+                    },
+                });
+                return;
+            }
+            const { code } = req.body || {};
+            const result = await service.checkPythonSyntax(code);
+            res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", result);
+            super.send(res);
+        }
+        catch (error) {
+            next(error);
+            logger_1.default.error(error);
+        }
+    }
+    async getEditorQuestions(req, res, next) {
+        try {
+            const userPayload = await this.verifyUserRole(req);
+            if (userPayload === null) {
+                res.status(http_status_codes_1.StatusCodes.UNAUTHORIZED).json({
+                    statusCode: http_status_codes_1.StatusCodes.UNAUTHORIZED,
+                    response: {
+                        code: "UNAUTHORIZED",
+                        message: "Authentication token required.",
+                    },
+                });
+                return;
+            }
+            if (userPayload === false) {
+                res.status(http_status_codes_1.StatusCodes.FORBIDDEN).json({
+                    statusCode: http_status_codes_1.StatusCodes.FORBIDDEN,
+                    response: {
+                        code: "FORBIDDEN",
+                        message: "Access denied. Questions & Answers for Python Editor is restricted to the User role only.",
+                    },
+                });
+                return;
+            }
+            const bodyData = req.query;
+            const getAllQuestions = await service.getAllQuestions(bodyData, req.headers.authorization);
+            res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "", getAllQuestions);
+            super.send(res);
+        }
+        catch (error) {
+            next(error);
+            logger_1.default.error(error);
+        }
     }
     async getAllQuestions(req, res, next) {
         try {

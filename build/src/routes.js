@@ -13,6 +13,7 @@ const course_controller_1 = require("./components/course/course.controller");
 const module_controller_1 = require("./components/module/module.controller");
 const lesson_controller_1 = require("./components/lesson/lesson.controller");
 const question_controller_1 = __importDefault(require("./components/question/question.controller"));
+const contact_controller_1 = __importDefault(require("./components/contact/contact.controller"));
 function registerRoutes() {
     const router = (0, express_1.Router)();
     const userController = new user_controller_1.default();
@@ -31,6 +32,9 @@ function registerRoutes() {
     router.use("/api/lesson", lessonController.register());
     const questionController = new question_controller_1.default();
     router.use("/api/question", questionController.register());
+    // Contact Enquiry and Admin routes
+    const contactController = new contact_controller_1.default();
+    router.use(contactController.register());
     return router;
 }
 //# sourceMappingURL=routes.js.map

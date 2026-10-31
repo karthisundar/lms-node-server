@@ -17,20 +17,56 @@ const createVideo = async (queryData, payload) => {
     try {
         const videoRefId = queryData?.videoRefId?.trim();
         const title = queryData?.title?.trim();
-        const filename = queryData?.filename?.trim();
-        const url = queryData?.url?.trim();
+        let filename = queryData?.filename?.trim();
+        let url = queryData?.url?.trim();
         const sessionId = queryData?.sessionId?.trim();
         const bucketId = queryData?.bucketId?.trim();
         /**
          * =========================================
-         * VALIDATION
+         * VALIDATION & SANITIZATION
          * =========================================
          */
         if (!title) {
             throw new Error("VIDEO_E_00002");
         }
-        if (!filename) {
-            throw new Error("VIDEO_E_00003");
+        // External provider check (YouTube, Google Drive, Vimeo)
+        const isExternal = /youtube\.com|youtu\.be|drive\.google\.com|vimeo\.com/i.test(url);
+        if (isExternal) {
+            if (!/^https?:\/\//i.test(url)) {
+                throw new Error("Invalid external video URL format");
+            }
+            if (!filename) {
+                filename = title;
+            }
+        }
+        else {
+            // S3, CDN, or relative file storage:
+            // Extract only the relative object key or filename; NEVER store complete URL
+            let candidateKey = url || filename;
+            if (!candidateKey) {
+                throw new Error("VIDEO_E_00003");
+            }
+            if (candidateKey.startsWith("http://") || candidateKey.startsWith("https://")) {
+                try {
+                    const parsed = new URL(candidateKey);
+                    candidateKey = parsed.pathname.replace(/^\/+/, "");
+                }
+                catch {
+                    throw new Error("Invalid video URL format");
+                }
+            }
+            // Path traversal security check
+            if (candidateKey.includes("..") || candidateKey.includes("\\")) {
+                throw new Error("Invalid filename: Path traversal is prohibited");
+            }
+            candidateKey = candidateKey.replace(/^\/+/, "");
+            if (!candidateKey) {
+                throw new Error("VIDEO_E_00003");
+            }
+            url = candidateKey;
+            if (!filename || filename.startsWith("http://") || filename.startsWith("https://")) {
+                filename = candidateKey.split("/").pop() || candidateKey;
+            }
         }
         if (!url) {
             throw new Error("VIDEO_E_00004");

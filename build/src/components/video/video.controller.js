@@ -41,11 +41,15 @@ const BaseApi_1 = __importDefault(require("../BaseApi"));
 const http_status_codes_1 = require("http-status-codes");
 const ApiResponses_1 = require("../../abstractions/ApiResponses");
 const service = __importStar(require("./video.service"));
+const videoUpload_1 = __importDefault(require("../../middleware/videoUpload"));
+const jwt_utils_1 = require("../auth/jwt.utils");
+const path_1 = __importDefault(require("path"));
 class VideoController extends BaseApi_1.default {
     constructor() {
         super();
     }
     register() {
+        this.router.post("/upload", videoUpload_1.default.single("video"), this.uploadVideo.bind(this));
         this.router.post("/createVideo", this.createVideo.bind(this));
         this.router.get("/getAllVideos", this.getAllVideos.bind(this));
         this.router.get("/getVideo", this.getVideo.bind(this));
@@ -53,6 +57,40 @@ class VideoController extends BaseApi_1.default {
         this.router.get("/getVideoProgress", this.getVideoProgress.bind(this));
         this.router.post("/createVideoProgress", this.createVideoProgress.bind(this));
         return this.router;
+    }
+    async uploadVideo(req, res, next) {
+        try {
+            const authHeader = req.headers.authorization;
+            if (!authHeader) {
+                res.status(401).json({ success: false, message: "Unauthorized" });
+                return;
+            }
+            const token = await (0, jwt_utils_1.verifyJWT)(authHeader);
+            const user = token?.payload;
+            if (!user) {
+                res.status(401).json({ success: false, message: "Invalid session" });
+                return;
+            }
+            const file = req.file;
+            if (!file) {
+                res.status(400).json({ success: false, message: "No video file provided" });
+                return;
+            }
+            // Safe relative object key or filename
+            const relativeKey = file.key || `videos/${file.filename}`;
+            const filename = path_1.default.basename(relativeKey);
+            res.locals.data = (0, ApiResponses_1.returnSuccess)(http_status_codes_1.StatusCodes.OK, "Video uploaded successfully", {
+                fileName: filename,
+                relativeKey,
+                originalName: file.originalname,
+                size: file.size,
+                mimetype: file.mimetype,
+            });
+            super.send(res);
+        }
+        catch (error) {
+            next(error);
+        }
     }
     async createVideo(req, res, next) {
         try {

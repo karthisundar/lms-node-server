@@ -21,6 +21,7 @@ export default class UserController extends BaseApi {
     // this.router.post('/login',validator(checkSchema(loginUser)),this.login.bind(this));
     this.router.post("/login", this.login.bind(this));
     this.router.get("/logout", this.logout.bind(this));
+    this.router.post("/logout", this.logout.bind(this));
     this.router.post("/setPassword", checkAccess, this.setPassword.bind(this));
     this.router.post(
       "/createUser",
@@ -30,6 +31,7 @@ export default class UserController extends BaseApi {
     );
     this.router.get("/getAllUsers", checkAccess, this.getAllUser.bind(this));
     this.router.get("/getUserDetails", this.getUserDetails.bind(this));
+    this.router.get("/me", this.getUserDetails.bind(this));
     this.router.get("/clientLabel", this.clientLabelJson.bind(this));
     this.router.post("/deleteUser", this.deleteUser.bind(this));
     this.router.get("/getUserMenu", this.getUserMenusNew.bind(this));

@@ -11,7 +11,7 @@ class Environment implements IEnvironment {
     public secretKey: string;
     public AWSAccessKeyId: string;
     public AWSSecretKey: string;
-    public AWSProfileName: string;
+    public AWSProfileName: string = "";
     public bucket: string;
     public serviceUrl: string;
     public productDetailsImagePath: string;
@@ -28,14 +28,20 @@ class Environment implements IEnvironment {
     public onlineStoreConsumerKey: string;
     public onlineStoreConsumerSecret: string;
     public resellerSiteUrl: string;
-    public transport = {
-        "name": "",
-        "host": "",
-        "port": null,
-        "secure": null,
-        "auth": null,
+    public transport: {
+        name: string;
+        host: string;
+        port: number | null;
+        secure: boolean | null;
+        auth: any;
+        dsn: any;
+    } = {
+        name: "",
+        host: "",
+        port: null,
+        secure: null,
+        auth: null,
         dsn: null
-
     }
     public db = {
         'host': '',
@@ -73,34 +79,34 @@ class Environment implements IEnvironment {
 
         let applyEncryption: any = process.env.APPLY_ENCRYPTION
         this.applyEncryption = JSON.parse(applyEncryption||false);
-        this.secretKey = process.env.SECRET_KEY;
+        this.secretKey = process.env.SECRET_KEY || "";
         this.db.host = process.env.DB_HOST;
         this.db.port = Number(process.env.DB_PORT);
         this.db.database = process.env.DB_DATABASE;
         this.db.password = process.env.DB_PASSWORD;
         this.db.name = process.env.DB_NAME;
         this.db.user = process.env.DB_USER;
-        this.AWSAccessKeyId = process.env.AWSAccessKeyId
-        this.AWSSecretKey = process.env.AWSSecretKey
-        this.bucket = process.env.Bucket
-        this.serviceUrl = process.env.ServiceUrl
-        this.headerImagePath = process.env.headerImagePath
-        this.productDetailsImagePath = process.env.productDetailsImagePath
-        this.barCodeImage = process.env.barCodeImage
-        this.AWSRegin = process.env.AWSRegin
-        this.storeLogo = process.env.storeLogo
-        this.qrCodePath = process.env.qrCodePath
-        this.client_url = process.env.client_url
-        this.email_url = process.env.email_url;
-        this.cc_email = process.env.cc_email;
-        this.resellerSiteUrl = process.env.resellerSiteUrl;
+        this.AWSAccessKeyId = process.env.AWSAccessKeyId || "";
+        this.AWSSecretKey = process.env.AWSSecretKey || "";
+        this.bucket = process.env.Bucket || "";
+        this.serviceUrl = process.env.ServiceUrl || "";
+        this.headerImagePath = process.env.headerImagePath || "";
+        this.productDetailsImagePath = process.env.productDetailsImagePath || "";
+        this.barCodeImage = process.env.barCodeImage || "";
+        this.AWSRegin = process.env.AWSRegin || "";
+        this.storeLogo = process.env.storeLogo || "";
+        this.qrCodePath = process.env.qrCodePath || "";
+        this.client_url = process.env.client_url || "";
+        this.email_url = process.env.email_url || "";
+        this.cc_email = process.env.cc_email || "";
+        this.resellerSiteUrl = process.env.resellerSiteUrl || "";
         // this.mobileAppUrl = process.env.mobileAppUrl;
-        this.onlineStoreUrl = process.env.onlineStoreUrl
-        this.onlineStoreConsumerKey = process.env.onlineStoreConsumerKey
-        this.onlineStoreConsumerSecret = process.env.onlineStoreConsumerSecret
+        this.onlineStoreUrl = process.env.onlineStoreUrl || "";
+        this.onlineStoreConsumerKey = process.env.onlineStoreConsumerKey || "";
+        this.onlineStoreConsumerSecret = process.env.onlineStoreConsumerSecret || "";
 
-        this.transport.name = process.env.email_type;
-        this.transport.host = process.env.email_host;
+        this.transport.name = process.env.email_type || "";
+        this.transport.host = process.env.email_host || "";
         this.transport.secure = Boolean(process.env.email_secure);
         this.transport.port = Number(process.env.email_port);
         this.transport.auth = {

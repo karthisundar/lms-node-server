@@ -10,6 +10,8 @@ const env = new environment_1.default();
 const App_1 = __importDefault(require("./App"));
 const logger_1 = __importDefault(require("./lib/logger"));
 const init_1 = __importDefault(require("./db/init"));
+// Initialize contact enquiry email background worker
+require("./workers/contactEnquiryEmailWorker");
 (0, init_1.default)();
 const app = new App_1.default();
 let server;

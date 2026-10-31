@@ -40,7 +40,7 @@ export const sessionUser = async (
     });
   } catch (error) {
     logger.error("Error sessionUserError", error);
-    throw new Error(error);
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 };
 
@@ -285,28 +285,33 @@ export const deleteSession = async (session_ref_id: string): Promise<any> => {
 export const createBucket = async (
   queryData: any,
   payload: any,
-): Promise<boolean> => {
+): Promise<any> => {
   try {
     const bucketRefId = queryData?.bucketRefId?.trim();
-
     const bucketName = queryData?.bucketName?.trim();
+    const serviceUrl = queryData?.serviceUrl?.trim() || queryData?.url?.trim() || 'https://s3.amazonaws.com';
+    let status = 1;
+    if (queryData?.status !== undefined && queryData?.status !== null) {
+      if (typeof queryData.status === 'boolean') {
+        status = queryData.status ? 1 : 0;
+      } else if (typeof queryData.status === 'string') {
+        status = queryData.status.toLowerCase() === 'active' || queryData.status === '1' ? 1 : 0;
+      } else {
+        status = Number(queryData.status) || 0;
+      }
+    }
 
-    const serviceUrl = queryData?.serviceUrl?.trim();
-
-    const status = queryData?.status ?? 1;
+    if (!bucketName) {
+      throw new Error("Bucket name is mandatory.");
+    }
 
     // Get logged-in/action user
-    const findUser = await getActionUser(payload?.user_ref_id);
+    const findUser = await getActionUser(payload?.user_ref_id, payload?.user_id || payload?.id);
 
-    // =====================================================
     // UPDATE FLOW
-    // =====================================================
-
     if (bucketRefId) {
       const existingBucket = await BucketMaster.findOne({
-        where: {
-          bucketRefId,
-        },
+        where: { bucketRefId },
       });
 
       if (!existingBucket) {
@@ -321,44 +326,34 @@ export const createBucket = async (
         updatedAt: new Date(),
       };
 
-      await sequelizeConnection.transaction(
-        async (transaction: Transaction) => {
-          await BucketMaster.update(updateObj, {
-            where: {
-              bucketRefId,
-            },
-            transaction,
-          });
-        },
-      );
+      await sequelizeConnection.transaction(async (transaction: Transaction) => {
+        await BucketMaster.update(updateObj, {
+          where: { bucketRefId },
+          transaction,
+        });
+      });
 
-      return true;
+      return { bucketRefId, bucketName, serviceUrl, status };
     }
 
-    // =====================================================
     // CREATE FLOW
-    // =====================================================
-
+    const newRefId = randomUUID();
     const newBucketObj: any = {
-      bucketRefId: randomUUID(),
+      bucketRefId: newRefId,
       bucketName,
       serviceUrl,
       status,
-
       createdBy: findUser?.user_id,
       createdAt: new Date(),
     };
 
     await sequelizeConnection.transaction(async (transaction: Transaction) => {
-      await BucketMaster.create(newBucketObj, {
-        transaction,
-      });
+      await BucketMaster.create(newBucketObj, { transaction });
     });
 
-    return true;
+    return newBucketObj;
   } catch (error) {
     logger.error("Error createBucket/bucketMaster.ts", error);
-
     throw error;
   }
 };

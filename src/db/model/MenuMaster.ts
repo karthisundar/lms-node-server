@@ -1,4 +1,4 @@
-import { DataTypes, Model, ModelStatic, Optional, Sequelize } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 import sequelizeConnection from "../config";
 
 interface menuMasterAttributes {

@@ -16,8 +16,10 @@ const CourseMaster_1 = __importDefault(require("../model/CourseMaster"));
 const ModuleMaster_1 = __importDefault(require("../model/ModuleMaster"));
 const UserMaping_1 = __importDefault(require("../model/UserMaping"));
 const LecturerCourseMapping_1 = __importDefault(require("../model/LecturerCourseMapping"));
+const UserLessonMapping_1 = __importDefault(require("../model/UserLessonMapping"));
 const user_1 = require("./user");
 const ADMIN_ROLE_ID = 1;
+const USER_ROLE_ID = 2;
 const LECTURER_ROLE_ID = 3;
 // =====================================================
 // AUTHENTICATED USER RESOLUTION
@@ -56,13 +58,46 @@ const getQuestionAccess = async (userId) => {
     if (roleIds.includes(ADMIN_ROLE_ID)) {
         return {
             isAdmin: true,
+            isUser: false,
             lessonIds: null,
+        };
+    }
+    // Student (User role) access to questions for active lessons / assigned lessons
+    if (roleIds.includes(USER_ROLE_ID)) {
+        const userLessons = await UserLessonMapping_1.default.findAll({
+            where: {
+                userId,
+                status: 1,
+            },
+            attributes: ["lessonId"],
+            raw: true,
+        });
+        let lessonIds = [
+            ...new Set(userLessons.map((row) => Number(row.lessonId)).filter(Boolean)),
+        ];
+        if (!lessonIds.length) {
+            const activeLessons = await LessonMaster_1.default.findAll({
+                where: {
+                    status: {
+                        [sequelize_1.Op.in]: ["active", "published"],
+                    },
+                },
+                attributes: ["lessonId"],
+                raw: true,
+            });
+            lessonIds = activeLessons.map((row) => Number(row.lessonId));
+        }
+        return {
+            isAdmin: false,
+            isUser: true,
+            lessonIds,
         };
     }
     // Other roles are denied unless they are lecturers.
     if (!roleIds.includes(LECTURER_ROLE_ID)) {
         return {
             isAdmin: false,
+            isUser: false,
             lessonIds: [],
         };
     }

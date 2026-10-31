@@ -10,9 +10,11 @@ import CourseMaster from "../model/CourseMaster";
 import ModuleMaster from "../model/ModuleMaster";
 import UserRoleMapping from "../model/UserMaping";
 import LecturerCourseMapping from "../model/LecturerCourseMapping";
+import UserLessonMapping from "../model/UserLessonMapping";
 import { getActionUser } from "./user";
 
 const ADMIN_ROLE_ID = 1;
+const USER_ROLE_ID = 2;
 const LECTURER_ROLE_ID = 3;
 
 // =====================================================
@@ -64,7 +66,46 @@ export const getQuestionAccess = async (userId: number) => {
   if (roleIds.includes(ADMIN_ROLE_ID)) {
     return {
       isAdmin: true,
+      isUser: false,
       lessonIds: null as number[] | null,
+    };
+  }
+
+  // Student (User role) access to questions for active lessons / assigned lessons
+  if (roleIds.includes(USER_ROLE_ID)) {
+    const userLessons = await UserLessonMapping.findAll({
+      where: {
+        userId,
+        status: 1,
+      },
+      attributes: ["lessonId"],
+      raw: true,
+    });
+
+    let lessonIds = [
+      ...new Set(
+        userLessons.map((row: any) => Number(row.lessonId)).filter(Boolean),
+      ),
+    ];
+
+    if (!lessonIds.length) {
+      const activeLessons = await LessonMaster.findAll({
+        where: {
+          status: {
+            [Op.in]: ["active", "published"],
+          },
+        },
+        attributes: ["lessonId"],
+        raw: true,
+      });
+
+      lessonIds = activeLessons.map((row: any) => Number(row.lessonId));
+    }
+
+    return {
+      isAdmin: false,
+      isUser: true,
+      lessonIds,
     };
   }
 
@@ -72,6 +113,7 @@ export const getQuestionAccess = async (userId: number) => {
   if (!roleIds.includes(LECTURER_ROLE_ID)) {
     return {
       isAdmin: false,
+      isUser: false,
       lessonIds: [] as number[],
     };
   }

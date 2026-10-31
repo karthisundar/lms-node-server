@@ -12,11 +12,12 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "strict": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "src/**/*.ts",    
-    "index.js",
+    "index.ts",
     "config/*.config.js" // for *.config.js files
   ],
   "exclude": [
