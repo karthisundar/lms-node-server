@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import { returnSuccess } from "../../abstractions/ApiResponses";
 import * as service from "./video.service";
 import videoUpload from "../../middleware/videoUpload";
+import { checkAccess, checkAdminAccess } from "../../middleware/authorization";
 import { verifyJWT } from "../auth/jwt.utils";
 import path from "path";
 
@@ -13,14 +14,15 @@ export class VideoController extends BaseApi {
   }
 
   public register(): Router {
-    this.router.post("/upload", videoUpload.single("video"), this.uploadVideo.bind(this));
-    this.router.post("/createVideo", this.createVideo.bind(this));
-    this.router.get("/getAllVideos", this.getAllVideos.bind(this));
-    this.router.get("/getVideo", this.getVideo.bind(this));
-    this.router.post("/deleteVideo", this.deleteVideo.bind(this));
-    this.router.get("/getVideoProgress", this.getVideoProgress.bind(this));
+    this.router.post("/upload", checkAdminAccess, videoUpload.single("video"), this.uploadVideo.bind(this));
+    this.router.post("/createVideo", checkAdminAccess, this.createVideo.bind(this));
+    this.router.get("/getAllVideos", checkAccess, this.getAllVideos.bind(this));
+    this.router.get("/getVideo", checkAccess, this.getVideo.bind(this));
+    this.router.post("/deleteVideo", checkAdminAccess, this.deleteVideo.bind(this));
+    this.router.get("/getVideoProgress", checkAccess, this.getVideoProgress.bind(this));
     this.router.post(
       "/createVideoProgress",
+      checkAccess,
       this.createVideoProgress.bind(this),
     );
     return this.router;

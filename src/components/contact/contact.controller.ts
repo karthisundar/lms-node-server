@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import logger from "../../lib/logger";
 import { verifyJWT } from "../auth/jwt.utils";
 import * as contactService from "./contact.service";
+import { publicEnquiryRateLimiter } from "../../middleware/rateLimiter";
 
 export default class ContactController extends BaseApi {
   constructor() {
@@ -12,7 +13,7 @@ export default class ContactController extends BaseApi {
 
   public register(): Router {
     // Public enquiry submission
-    this.router.post("/api/contact-enquiries", this.submitEnquiry.bind(this));
+    this.router.post("/api/contact-enquiries", publicEnquiryRateLimiter, this.submitEnquiry.bind(this));
 
     // Admin protected management endpoints
     this.router.get(

@@ -37,7 +37,7 @@ const fileFilter = (req, file, callback) => {
     const extension = originalName.substring(originalName.lastIndexOf("."));
     const mimeValid = allowedMimeTypes.includes(file.mimetype.toLowerCase());
     const extValid = allowedExtensions.includes(extension);
-    if (!mimeValid && !extValid) {
+    if (!mimeValid || !extValid) {
         return callback(new Error("Only MP4, WEBM, OGG, MOV, MKV, and AVI video files are allowed."));
     }
     callback(null, true);

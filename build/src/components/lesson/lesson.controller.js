@@ -42,13 +42,14 @@ const http_status_codes_1 = require("http-status-codes");
 const ApiResponses_1 = require("../../abstractions/ApiResponses");
 const service = __importStar(require("./lesson.service"));
 const lessonNotesUpload_1 = __importDefault(require("../../middleware/lessonNotesUpload"));
+const authorization_1 = require("../../middleware/authorization");
 class LessionController extends BaseApi_1.default {
     constructor() {
         super();
     }
     register() {
-        this.router.post("/createLesson", this.createLesson.bind(this));
-        this.router.post("/deleteLesson", this.deleteLesson.bind(this));
+        this.router.post("/createLesson", authorization_1.checkAdminAccess, this.createLesson.bind(this));
+        this.router.post("/deleteLesson", authorization_1.checkAdminAccess, this.deleteLesson.bind(this));
         this.router.get("/getAllLessons", this.getAllLessons.bind(this));
         this.router.get("/getLesson", this.getLesson.bind(this));
         this.router.get("/getAllLessonVideoMappings", this.getAllLessonVideoMappings.bind(this));
@@ -56,7 +57,7 @@ class LessionController extends BaseApi_1.default {
         this.router.post("/createLessonVideoMapping", this.createLessonVideoMapping.bind(this));
         this.router.post("/deleteLessonVideoMapping", this.deleteLessonVideoMapping.bind(this));
         this.router.post("/createLessonNotes", lessonNotesUpload_1.default.single("file"), this.createLessonNotes.bind(this));
-        this.router.post("/deleteLessonNotes", this.deleteLessonNotes.bind(this));
+        this.router.post("/deleteLessonNotes", authorization_1.checkAdminAccess, this.deleteLessonNotes.bind(this));
         this.router.get("/getAllLessonNotes", this.getAllLessonNotes.bind(this));
         this.router.get("/getLessonNotes", this.getLessonNotes.bind(this));
         this.router.post("/createUserLessonMapping", this.createUserLessonMapping.bind(this));

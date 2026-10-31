@@ -4,6 +4,7 @@ import logger from "../../lib/logger";
 import { StatusCodes } from "http-status-codes";
 import { returnSuccess } from "../../abstractions/ApiResponses";
 import * as service from "./session.service";
+import { checkAccess, checkAdminAccess } from "../../middleware/authorization";
 
 export class SessionController extends BaseApi {
   constructor() {
@@ -11,10 +12,10 @@ export class SessionController extends BaseApi {
   }
 
   public register(): Router {
-    this.router.post("/createSession", this.createSession.bind(this));
-    this.router.get("/getAllSessions", this.getAllSessions.bind(this));
-    this.router.get("/getSession", this.getSession.bind(this));
-    this.router.post("/deleteSession", this.deleteSession.bind(this));
+    this.router.post("/createSession", checkAdminAccess, this.createSession.bind(this));
+    this.router.get("/getAllSessions", checkAccess, this.getAllSessions.bind(this));
+    this.router.get("/getSession", checkAccess, this.getSession.bind(this));
+    this.router.post("/deleteSession", checkAdminAccess, this.deleteSession.bind(this));
     this.router.post(
       "/createUserSessionMapping",
       this.createUserSessionMapping.bind(this),

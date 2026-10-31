@@ -4,6 +4,7 @@ import logger from "../../lib/logger";
 import { StatusCodes } from "http-status-codes";
 import { returnSuccess } from "../../abstractions/ApiResponses";
 import * as service from "./course.service";
+import { checkAdminAccess } from "../../middleware/authorization";
 
 export class CourseController extends BaseApi {
   constructor() {
@@ -11,8 +12,8 @@ export class CourseController extends BaseApi {
   }
 
   public register(): Router {
-    this.router.post("/createCourse", this.createCourse.bind(this));
-    this.router.post("/deleteCourse", this.deleteCourse.bind(this));
+    this.router.post("/createCourse", checkAdminAccess, this.createCourse.bind(this));
+    this.router.post("/deleteCourse", checkAdminAccess, this.deleteCourse.bind(this));
     this.router.get("/getAllCourses", this.getAllCourses.bind(this));
     this.router.get("/getCourse", this.getCourse.bind(this));
     return this.router;

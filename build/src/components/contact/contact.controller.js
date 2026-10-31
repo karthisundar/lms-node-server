@@ -41,13 +41,14 @@ const http_status_codes_1 = require("http-status-codes");
 const logger_1 = __importDefault(require("../../lib/logger"));
 const jwt_utils_1 = require("../auth/jwt.utils");
 const contactService = __importStar(require("./contact.service"));
+const rateLimiter_1 = require("../../middleware/rateLimiter");
 class ContactController extends BaseApi_1.default {
     constructor() {
         super();
     }
     register() {
         // Public enquiry submission
-        this.router.post("/api/contact-enquiries", this.submitEnquiry.bind(this));
+        this.router.post("/api/contact-enquiries", rateLimiter_1.publicEnquiryRateLimiter, this.submitEnquiry.bind(this));
         // Admin protected management endpoints
         this.router.get("/api/admin/contact-enquiries", this.verifyAdminMiddleware.bind(this), this.getAdminEnquiries.bind(this));
         this.router.get("/api/admin/contact-enquiries/:id", this.verifyAdminMiddleware.bind(this), this.getAdminEnquiryById.bind(this));

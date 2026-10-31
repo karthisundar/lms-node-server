@@ -41,13 +41,14 @@ const BaseApi_1 = __importDefault(require("../BaseApi"));
 const http_status_codes_1 = require("http-status-codes");
 const ApiResponses_1 = require("../../abstractions/ApiResponses");
 const service = __importStar(require("./course.service"));
+const authorization_1 = require("../../middleware/authorization");
 class CourseController extends BaseApi_1.default {
     constructor() {
         super();
     }
     register() {
-        this.router.post("/createCourse", this.createCourse.bind(this));
-        this.router.post("/deleteCourse", this.deleteCourse.bind(this));
+        this.router.post("/createCourse", authorization_1.checkAdminAccess, this.createCourse.bind(this));
+        this.router.post("/deleteCourse", authorization_1.checkAdminAccess, this.deleteCourse.bind(this));
         this.router.get("/getAllCourses", this.getAllCourses.bind(this));
         this.router.get("/getCourse", this.getCourse.bind(this));
         return this.router;

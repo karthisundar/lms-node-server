@@ -32,8 +32,12 @@ const fileFilter = (req, file, callback) => {
     }
     callback(null, true);
 };
-const lessonNotesUpload = (0, multer_1.default)({
-    storage: (0, multer_s3_1.default)({
+// Check if S3 credentials and bucket are configured
+const isS3Configured = Boolean(process.env.AWS_S3_BUCKET_NAME &&
+    process.env.AWS_ACCESS_KEY_ID &&
+    process.env.AWS_SECRET_ACCESS_KEY);
+const storage = isS3Configured
+    ? (0, multer_s3_1.default)({
         s3: s3_1.default,
         bucket: process.env.AWS_S3_BUCKET_NAME,
         contentType: multer_s3_1.default.AUTO_CONTENT_TYPE,
@@ -51,7 +55,29 @@ const lessonNotesUpload = (0, multer_1.default)({
             const key = `lesson-notes/${timestamp}-${sanitizedFileName}`;
             cb(null, key);
         },
-    }),
+    })
+    : (() => {
+        const fs = require("fs");
+        const path = require("path");
+        const localDir = path.resolve(__dirname, "../../appData/lesson-notes");
+        if (!fs.existsSync(localDir)) {
+            fs.mkdirSync(localDir, { recursive: true });
+        }
+        return multer_1.default.diskStorage({
+            destination: (req, file, cb) => {
+                cb(null, localDir);
+            },
+            filename: (req, file, cb) => {
+                const timestamp = Date.now();
+                const sanitizedFileName = file.originalname
+                    .replace(/\s+/g, "_")
+                    .replace(/[^a-zA-Z0-9._-]/g, "");
+                cb(null, `${timestamp}-${sanitizedFileName}`);
+            },
+        });
+    })();
+const lessonNotesUpload = (0, multer_1.default)({
+    storage,
     fileFilter,
     limits: {
         fileSize: 20 * 1024 * 1024, // 20 MB

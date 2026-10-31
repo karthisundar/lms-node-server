@@ -42,21 +42,22 @@ const http_status_codes_1 = require("http-status-codes");
 const ApiResponses_1 = require("../../abstractions/ApiResponses");
 const service = __importStar(require("./question.service"));
 const jwt_utils_1 = require("../auth/jwt.utils");
+const authorization_1 = require("../../middleware/authorization");
 class QuestionController extends BaseApi_1.default {
     constructor() {
         super();
     }
     register() {
-        this.router.get("/getAllQuestions", this.getAllQuestions.bind(this));
-        this.router.get("/getQuestionByRefId", this.getQuestionByRefId.bind(this));
+        this.router.get("/getAllQuestions", authorization_1.checkAccess, this.getAllQuestions.bind(this));
+        this.router.get("/getQuestionByRefId", authorization_1.checkAccess, this.getQuestionByRefId.bind(this));
         this.router.get("/getEditorQuestions", this.getEditorQuestions.bind(this));
         this.router.post("/checkSyntax", this.checkSyntax.bind(this));
-        this.router.post("/createOrUpdateQuestion", this.createOrUpdateQuestion.bind(this));
-        this.router.post("/createQuestion", this.createOrUpdateQuestion.bind(this));
-        this.router.post("/deleteQuestion", this.deleteQuestion.bind(this));
-        this.router.post("/createQuestionAnswer", this.createQuestionAnswer.bind(this));
-        this.router.post("/updateQuestionAnswer", this.updateQuestionAnswer.bind(this));
-        this.router.post("/deleteQuestionAnswer", this.deleteQuestionAnswer.bind(this));
+        this.router.post("/createOrUpdateQuestion", authorization_1.checkAdminAccess, this.createOrUpdateQuestion.bind(this));
+        this.router.post("/createQuestion", authorization_1.checkAdminAccess, this.createOrUpdateQuestion.bind(this));
+        this.router.post("/deleteQuestion", authorization_1.checkAdminAccess, this.deleteQuestion.bind(this));
+        this.router.post("/createQuestionAnswer", authorization_1.checkAdminAccess, this.createQuestionAnswer.bind(this));
+        this.router.post("/updateQuestionAnswer", authorization_1.checkAdminAccess, this.updateQuestionAnswer.bind(this));
+        this.router.post("/deleteQuestionAnswer", authorization_1.checkAdminAccess, this.deleteQuestionAnswer.bind(this));
         return this.router;
     }
     async verifyUserRole(req) {

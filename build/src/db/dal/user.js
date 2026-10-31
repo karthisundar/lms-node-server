@@ -100,7 +100,7 @@ const login = async (userData) => {
         throw new Error(clientlabel_config_json_1.default.user.userError.userNotFound.code);
     }
     const findOldPasswordMatch = bcrypt.compareSync(decodedString, findDataValues?.password);
-    console.log(findUser?.length, "findUser?.length", decodedString, "findOldPasswordMatch", findOldPasswordMatch);
+    // Sensitive password and credential log removed for security audit compliance
     if (!findOldPasswordMatch)
         throw new Error(clientlabel_config_json_1.default.user.userError.loginError.code);
     const transaction = await config_1.default.transaction();

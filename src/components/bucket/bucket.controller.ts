@@ -6,7 +6,7 @@ import { returnSuccess } from "../../abstractions/ApiResponses";
 import * as service from "./bucket.service";
 import clientLabel from "../../config/clientlabel.config.json";
 import serverLabel from "../../config/serverlabel.config.json";
-import { checkAccess } from "../../middleware/authorization";
+import { checkAdminAccess } from "../../middleware/authorization";
 
 export class BucketController extends BaseApi {
   constructor() {

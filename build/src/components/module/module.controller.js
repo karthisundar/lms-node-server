@@ -41,13 +41,14 @@ const BaseApi_1 = __importDefault(require("../BaseApi"));
 const http_status_codes_1 = require("http-status-codes");
 const ApiResponses_1 = require("../../abstractions/ApiResponses");
 const service = __importStar(require("./module.service"));
+const authorization_1 = require("../../middleware/authorization");
 class ModuleController extends BaseApi_1.default {
     constructor() {
         super();
     }
     register() {
-        this.router.post("/createModule", this.createModule.bind(this));
-        this.router.post("/deleteModule", this.deleteModule.bind(this));
+        this.router.post("/createModule", authorization_1.checkAdminAccess, this.createModule.bind(this));
+        this.router.post("/deleteModule", authorization_1.checkAdminAccess, this.deleteModule.bind(this));
         this.router.get("/getAllModules", this.getAllModules.bind(this));
         this.router.get("/getModule", this.getModule.bind(this));
         return this.router;

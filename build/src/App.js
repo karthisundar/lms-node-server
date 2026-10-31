@@ -45,7 +45,8 @@ class App {
         // let isAsset = req.url.toLowerCase().match(/\/(.*\.(ttf|woff|json|js|css|map|png|svg|jpg|xlsx|txt|jpeg|csv|xlsx|pdf))\??/);
         let isAsset = req.url.match(/\/(.*\.(ttf|woff|json|js|css|map|png|svg|jpg|xlsx|txt|jpeg|csv|pdf))\??/i);
         let splittedFilePath = isAsset ? isAsset[1]?.split('/') : null;
-        let fileName = splittedFilePath?.[splittedFilePath?.length - 1];
+        let rawFileName = splittedFilePath?.[splittedFilePath?.length - 1] || '';
+        let fileName = path_1.default.basename(rawFileName);
         if (req.url.indexOf('/s3/images') != -1 && isAsset) {
             if (fs_1.default.existsSync(`${allImagePath}/profileBanner/${fileName}`)) {
                 return res.sendFile(fileName, { root: `${allImagePath}/profileBanner` });
@@ -88,14 +89,31 @@ class App {
     }
     middleware() {
         this.express.use((0, helmet_1.default)({ contentSecurityPolicy: false }));
-        this.express.use(express_1.default.json({ limit: '100mb' }));
-        this.express.use(express_1.default.urlencoded({ limit: '100mb', extended: true }));
-        const corsOptions = {
-            origin: [
-                '*',
-            ],
-        };
-        this.express.use((0, cors_1.default)());
+        this.express.use(express_1.default.json({ limit: '10mb' }));
+        this.express.use(express_1.default.urlencoded({ limit: '10mb', extended: true }));
+        const allowedOrigins = [
+            process.env.CLIENT_URL,
+            process.env.CLIENT_BASE_URL,
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173',
+        ].filter(Boolean);
+        this.express.use((0, cors_1.default)({
+            origin: (origin, callback) => {
+                // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+                if (!origin)
+                    return callback(null, true);
+                if (allowedOrigins.length === 0 || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+                    return callback(null, true);
+                }
+                // In development or local testing allow localhost
+                if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+                    return callback(null, true);
+                }
+                return callback(null, true);
+            },
+            credentials: true,
+        }));
     }
 }
 exports.default = App;

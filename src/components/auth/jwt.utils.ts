@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const privateKey = `-----BEGIN PRIVATE KEY-----
+const privateKey = process.env.JWT_PRIVATE_KEY || `-----BEGIN PRIVATE KEY-----
 MIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQCveu+T7j/1a8LY
 HpJxOvBxlTguDUDHabhBcFATKfg/pGedxBhhW5VgE/N6vYMunucRJrIRaBl810vP
 0VhnNfdfwvzvEVGSnNkoC+JCepFtpyRpVHWqB6co8a+TyU4x517LpSuEJCmE8DNI
@@ -53,7 +53,7 @@ fFMe9eLU8y73xUNn04oEEpIMICm0qMye6dSLL+l0BQogxOuJvTj+vLUmeFx0P74a
 mrL2yJiSgGlbs+2GzSOGSIkm8JtCtw==
 -----END PRIVATE KEY-----`;
 
-const publicKey = `-----BEGIN PUBLIC KEY-----
+const publicKey = process.env.JWT_PUBLIC_KEY || `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAr3rvk+4/9WvC2B6ScTrw
 cZU4Lg1Ax2m4QXBQEyn4P6RnncQYYVuVYBPzer2DLp7nESayEWgZfNdLz9FYZzX3
 X8L87xFRkpzZKAviQnqRbackaVR1qgenKPGvk8lOMedey6UrhCQphPAzSOLia1ta
@@ -69,22 +69,44 @@ zEUK6slCRgpIqlorRVXVj/kCAwEAAQ==
 -----END PUBLIC KEY-----`;
 
 // sign jwt
-export const signJWT = async(payload: object, expiresIn: string | number) : Promise<any> => jwt.sign(payload, privateKey, { algorithm: 'RS256' });
-
+export const signJWT = async (
+  payload: object,
+  expiresIn?: string | number
+): Promise<string> => {
+  const options: any = {
+    algorithm: "RS256",
+  };
+  if (expiresIn !== undefined && expiresIn !== null && expiresIn !== "") {
+    (options as any).expiresIn = expiresIn;
+  } else {
+    options.expiresIn = "1d";
+  }
+  return jwt.sign(payload, privateKey, options);
+};
 
 // verify jwt
-export const verifyJWT = (token: string): { payload: any; expired: boolean; token?: string } => {
-	try {
-		if (!token || typeof token !== 'string') {
-			return { payload: null, expired: false };
-		}
-		const cleanToken = token.replace(/^Bearer\s+/i, '').trim();
-		const decoded = jwt.verify(cleanToken, publicKey);
-		return { payload: decoded, expired: false, token: cleanToken };
-	} catch (error: any) {
-		return {
-			payload: null,
-			expired: Boolean(error?.message?.includes('Jwt token was expired') || error?.message?.includes('jwt expired')),
-		};
-	}
+export const verifyJWT = (
+  token: string
+): { payload: any; expired: boolean; token?: string } => {
+  try {
+    if (!token || typeof token !== "string") {
+      return { payload: null, expired: false };
+    }
+    const cleanToken = token.replace(/^Bearer\s+/i, "").trim();
+    if (!cleanToken) {
+      return { payload: null, expired: false };
+    }
+    const decoded = jwt.verify(cleanToken, publicKey, {
+      algorithms: ["RS256"],
+    });
+    return { payload: decoded, expired: false, token: cleanToken };
+  } catch (error: any) {
+    return {
+      payload: null,
+      expired: Boolean(
+        error?.message?.includes("Jwt token was expired") ||
+          error?.message?.includes("jwt expired")
+      ),
+    };
+  }
 };

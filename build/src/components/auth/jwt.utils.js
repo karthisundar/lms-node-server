@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyJWT = exports.signJWT = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const privateKey = `-----BEGIN PRIVATE KEY-----
+const privateKey = process.env.JWT_PRIVATE_KEY || `-----BEGIN PRIVATE KEY-----
 MIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQCveu+T7j/1a8LY
 HpJxOvBxlTguDUDHabhBcFATKfg/pGedxBhhW5VgE/N6vYMunucRJrIRaBl810vP
 0VhnNfdfwvzvEVGSnNkoC+JCepFtpyRpVHWqB6co8a+TyU4x517LpSuEJCmE8DNI
@@ -57,7 +57,7 @@ fFMe9eLU8y73xUNn04oEEpIMICm0qMye6dSLL+l0BQogxOuJvTj+vLUmeFx0P74a
 7Hig79Mz7RydULTlA+/2VhIk/R00GtxyJAcH2UBDzIOqJ0plCNfI7mO5y0jqqVdE
 mrL2yJiSgGlbs+2GzSOGSIkm8JtCtw==
 -----END PRIVATE KEY-----`;
-const publicKey = `-----BEGIN PUBLIC KEY-----
+const publicKey = process.env.JWT_PUBLIC_KEY || `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAr3rvk+4/9WvC2B6ScTrw
 cZU4Lg1Ax2m4QXBQEyn4P6RnncQYYVuVYBPzer2DLp7nESayEWgZfNdLz9FYZzX3
 X8L87xFRkpzZKAviQnqRbackaVR1qgenKPGvk8lOMedey6UrhCQphPAzSOLia1ta
@@ -72,22 +72,39 @@ HJXgnUj4qQujKHQoUylb3lqYENZdUCJLl3Jw8/tuAuTU6MKvXSpbrAPLZAzCxT9e
 zEUK6slCRgpIqlorRVXVj/kCAwEAAQ==
 -----END PUBLIC KEY-----`;
 // sign jwt
-const signJWT = async (payload, expiresIn) => jsonwebtoken_1.default.sign(payload, privateKey, { algorithm: 'RS256' });
+const signJWT = async (payload, expiresIn) => {
+    const options = {
+        algorithm: "RS256",
+    };
+    if (expiresIn !== undefined && expiresIn !== null && expiresIn !== "") {
+        options.expiresIn = expiresIn;
+    }
+    else {
+        options.expiresIn = "1d";
+    }
+    return jsonwebtoken_1.default.sign(payload, privateKey, options);
+};
 exports.signJWT = signJWT;
 // verify jwt
 const verifyJWT = (token) => {
     try {
-        if (!token || typeof token !== 'string') {
+        if (!token || typeof token !== "string") {
             return { payload: null, expired: false };
         }
-        const cleanToken = token.replace(/^Bearer\s+/i, '').trim();
-        const decoded = jsonwebtoken_1.default.verify(cleanToken, publicKey);
+        const cleanToken = token.replace(/^Bearer\s+/i, "").trim();
+        if (!cleanToken) {
+            return { payload: null, expired: false };
+        }
+        const decoded = jsonwebtoken_1.default.verify(cleanToken, publicKey, {
+            algorithms: ["RS256"],
+        });
         return { payload: decoded, expired: false, token: cleanToken };
     }
     catch (error) {
         return {
             payload: null,
-            expired: Boolean(error?.message?.includes('Jwt token was expired') || error?.message?.includes('jwt expired')),
+            expired: Boolean(error?.message?.includes("Jwt token was expired") ||
+                error?.message?.includes("jwt expired")),
         };
     }
 };

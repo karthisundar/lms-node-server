@@ -68,13 +68,7 @@ export const login = async (userData: any): Promise<any> => {
     decodedString,
     findDataValues?.password,
   );
-  console.log(
-    findUser?.length,
-    "findUser?.length",
-    decodedString,
-    "findOldPasswordMatch",
-    findOldPasswordMatch,
-  );
+  // Sensitive password and credential log removed for security audit compliance
 
   if (!findOldPasswordMatch)
     throw new Error(clientLabel.user.userError.loginError.code);

@@ -41,15 +41,16 @@ const BaseApi_1 = __importDefault(require("../BaseApi"));
 const http_status_codes_1 = require("http-status-codes");
 const ApiResponses_1 = require("../../abstractions/ApiResponses");
 const service = __importStar(require("./session.service"));
+const authorization_1 = require("../../middleware/authorization");
 class SessionController extends BaseApi_1.default {
     constructor() {
         super();
     }
     register() {
-        this.router.post("/createSession", this.createSession.bind(this));
-        this.router.get("/getAllSessions", this.getAllSessions.bind(this));
-        this.router.get("/getSession", this.getSession.bind(this));
-        this.router.post("/deleteSession", this.deleteSession.bind(this));
+        this.router.post("/createSession", authorization_1.checkAdminAccess, this.createSession.bind(this));
+        this.router.get("/getAllSessions", authorization_1.checkAccess, this.getAllSessions.bind(this));
+        this.router.get("/getSession", authorization_1.checkAccess, this.getSession.bind(this));
+        this.router.post("/deleteSession", authorization_1.checkAdminAccess, this.deleteSession.bind(this));
         this.router.post("/createUserSessionMapping", this.createUserSessionMapping.bind(this));
         this.router.get("/getAllUserSessionMappings", this.getAllUserSessionMappings.bind(this));
         this.router.get("/getUserSessionMapping", this.getUserSessionMapping.bind(this));

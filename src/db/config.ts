@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import logger from "../lib/logger";
 
-console.log(global.environment, "from config 112");
+// console.log(global.environment) removed for secret exposure compliance
 
 const dbEnv = global.environment.db;
 

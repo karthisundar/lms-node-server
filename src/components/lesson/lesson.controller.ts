@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { returnSuccess } from "../../abstractions/ApiResponses";
 import * as service from "./lesson.service";
 import lessonNotesUpload from "../../middleware/lessonNotesUpload";
+import { checkAccess, checkAdminAccess } from "../../middleware/authorization";
 
 export class LessionController extends BaseApi {
   constructor() {
@@ -12,8 +13,8 @@ export class LessionController extends BaseApi {
   }
 
   public register(): Router {
-    this.router.post("/createLesson", this.createLesson.bind(this));
-    this.router.post("/deleteLesson", this.deleteLesson.bind(this));
+    this.router.post("/createLesson", checkAdminAccess, this.createLesson.bind(this));
+    this.router.post("/deleteLesson", checkAdminAccess, this.deleteLesson.bind(this));
     this.router.get("/getAllLessons", this.getAllLessons.bind(this));
     this.router.get("/getLesson", this.getLesson.bind(this));
     this.router.get(
@@ -37,7 +38,7 @@ export class LessionController extends BaseApi {
       lessonNotesUpload.single("file"),
       this.createLessonNotes.bind(this),
     );
-    this.router.post("/deleteLessonNotes", this.deleteLessonNotes.bind(this));
+    this.router.post("/deleteLessonNotes", checkAdminAccess, this.deleteLessonNotes.bind(this));
     this.router.get("/getAllLessonNotes", this.getAllLessonNotes.bind(this));
     this.router.get("/getLessonNotes", this.getLessonNotes.bind(this));
     this.router.post(

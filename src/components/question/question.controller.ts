@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { returnSuccess } from "../../abstractions/ApiResponses";
 import * as service from "./question.service";
 import { verifyJWT } from "../auth/jwt.utils";
+import { checkAccess, checkAdminAccess } from "../../middleware/authorization";
 
 export default class QuestionController extends BaseApi {
   constructor() {
@@ -12,26 +13,30 @@ export default class QuestionController extends BaseApi {
   }
 
   public register(): Router {
-    this.router.get("/getAllQuestions", this.getAllQuestions.bind(this));
-    this.router.get("/getQuestionByRefId", this.getQuestionByRefId.bind(this));
+    this.router.get("/getAllQuestions", checkAccess, this.getAllQuestions.bind(this));
+    this.router.get("/getQuestionByRefId", checkAccess, this.getQuestionByRefId.bind(this));
     this.router.get("/getEditorQuestions", this.getEditorQuestions.bind(this));
     this.router.post("/checkSyntax", this.checkSyntax.bind(this));
     this.router.post(
       "/createOrUpdateQuestion",
+      checkAdminAccess,
       this.createOrUpdateQuestion.bind(this),
     );
-    this.router.post("/createQuestion", this.createOrUpdateQuestion.bind(this));
-    this.router.post("/deleteQuestion", this.deleteQuestion.bind(this));
+    this.router.post("/createQuestion", checkAdminAccess, this.createOrUpdateQuestion.bind(this));
+    this.router.post("/deleteQuestion", checkAdminAccess, this.deleteQuestion.bind(this));
     this.router.post(
       "/createQuestionAnswer",
+      checkAdminAccess,
       this.createQuestionAnswer.bind(this),
     );
     this.router.post(
       "/updateQuestionAnswer",
+      checkAdminAccess,
       this.updateQuestionAnswer.bind(this),
     );
     this.router.post(
       "/deleteQuestionAnswer",
+      checkAdminAccess,
       this.deleteQuestionAnswer.bind(this),
     );
     return this.router;

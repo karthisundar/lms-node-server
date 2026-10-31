@@ -36,7 +36,7 @@ const fileFilter: multer.Options["fileFilter"] = (req, file, callback) => {
   const mimeValid = allowedMimeTypes.includes(file.mimetype.toLowerCase());
   const extValid = allowedExtensions.includes(extension);
 
-  if (!mimeValid && !extValid) {
+  if (!mimeValid || !extValid) {
     return callback(
       new Error("Only MP4, WEBM, OGG, MOV, MKV, and AVI video files are allowed.")
     );

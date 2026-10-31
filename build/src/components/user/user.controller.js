@@ -44,6 +44,7 @@ const service = __importStar(require("./user.service"));
 const clientlabel_config_json_1 = __importDefault(require("../../config/clientlabel.config.json"));
 const serverlabel_config_json_1 = __importDefault(require("../../config/serverlabel.config.json"));
 const authorization_1 = require("../../middleware/authorization");
+const rateLimiter_1 = require("../../middleware/rateLimiter");
 const validator_1 = require("../validator");
 const express_validator_1 = require("express-validator");
 const user_validator_1 = require("./user.validator");
@@ -54,17 +55,17 @@ class UserController extends BaseApi_1.default {
     }
     register() {
         // this.router.post('/login',validator(checkSchema(loginUser)),this.login.bind(this));
-        this.router.post("/login", this.login.bind(this));
+        this.router.post("/login", rateLimiter_1.authRateLimiter, this.login.bind(this));
         this.router.get("/logout", this.logout.bind(this));
         this.router.post("/logout", this.logout.bind(this));
         this.router.post("/setPassword", authorization_1.checkAccess, this.setPassword.bind(this));
         this.router.post("/createUser", authorization_1.checkAccess, (0, validator_1.validator)((0, express_validator_1.checkSchema)(user_validator_1.checkCreateUser)), this.createUser.bind(this));
-        this.router.get("/getAllUsers", authorization_1.checkAccess, this.getAllUser.bind(this));
-        this.router.get("/getUserDetails", this.getUserDetails.bind(this));
-        this.router.get("/me", this.getUserDetails.bind(this));
+        this.router.get("/getAllUsers", authorization_1.checkAdminAccess, this.getAllUser.bind(this));
+        this.router.get("/getUserDetails", authorization_1.checkAccess, this.getUserDetails.bind(this));
+        this.router.get("/me", authorization_1.checkAccess, this.getUserDetails.bind(this));
         this.router.get("/clientLabel", this.clientLabelJson.bind(this));
-        this.router.post("/deleteUser", this.deleteUser.bind(this));
-        this.router.get("/getUserMenu", this.getUserMenusNew.bind(this));
+        this.router.post("/deleteUser", authorization_1.checkAdminAccess, this.deleteUser.bind(this));
+        this.router.get("/getUserMenu", authorization_1.checkAccess, this.getUserMenusNew.bind(this));
         return this.router;
     }
     async login(req, res, next) {

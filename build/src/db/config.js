@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
-console.log(global.environment, "from config 112");
+// console.log(global.environment) removed for secret exposure compliance
 const dbEnv = global.environment.db;
 const sequelizeConnection = new sequelize_1.Sequelize(dbEnv.database, dbEnv.user, dbEnv.password, {
     host: dbEnv.host,

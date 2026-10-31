@@ -42,6 +42,7 @@ const http_status_codes_1 = require("http-status-codes");
 const ApiResponses_1 = require("../../abstractions/ApiResponses");
 const service = __importStar(require("./video.service"));
 const videoUpload_1 = __importDefault(require("../../middleware/videoUpload"));
+const authorization_1 = require("../../middleware/authorization");
 const jwt_utils_1 = require("../auth/jwt.utils");
 const path_1 = __importDefault(require("path"));
 class VideoController extends BaseApi_1.default {
@@ -49,13 +50,13 @@ class VideoController extends BaseApi_1.default {
         super();
     }
     register() {
-        this.router.post("/upload", videoUpload_1.default.single("video"), this.uploadVideo.bind(this));
-        this.router.post("/createVideo", this.createVideo.bind(this));
-        this.router.get("/getAllVideos", this.getAllVideos.bind(this));
-        this.router.get("/getVideo", this.getVideo.bind(this));
-        this.router.post("/deleteVideo", this.deleteVideo.bind(this));
-        this.router.get("/getVideoProgress", this.getVideoProgress.bind(this));
-        this.router.post("/createVideoProgress", this.createVideoProgress.bind(this));
+        this.router.post("/upload", authorization_1.checkAdminAccess, videoUpload_1.default.single("video"), this.uploadVideo.bind(this));
+        this.router.post("/createVideo", authorization_1.checkAdminAccess, this.createVideo.bind(this));
+        this.router.get("/getAllVideos", authorization_1.checkAccess, this.getAllVideos.bind(this));
+        this.router.get("/getVideo", authorization_1.checkAccess, this.getVideo.bind(this));
+        this.router.post("/deleteVideo", authorization_1.checkAdminAccess, this.deleteVideo.bind(this));
+        this.router.get("/getVideoProgress", authorization_1.checkAccess, this.getVideoProgress.bind(this));
+        this.router.post("/createVideoProgress", authorization_1.checkAccess, this.createVideoProgress.bind(this));
         return this.router;
     }
     async uploadVideo(req, res, next) {
